@@ -1,2 +1,3 @@
 - Khoi Nguyen
 - Seoin Kim
+- Eddie Franco
