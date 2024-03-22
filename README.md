@@ -1,1 +1,2 @@
 - Khoi Nguyen
+- Seoin Kim
