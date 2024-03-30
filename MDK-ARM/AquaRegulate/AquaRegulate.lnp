@@ -1,0 +1,27 @@
+--cpu Cortex-M0
+"aquaregulate\startup_stm32f072xb.o"
+"aquaregulate\main.o"
+"aquaregulate\stm32f0xx_it.o"
+"aquaregulate\stm32f0xx_hal_msp.o"
+"aquaregulate\stm32f0xx_hal_tim.o"
+"aquaregulate\stm32f0xx_hal_tim_ex.o"
+"aquaregulate\stm32f0xx_hal_uart.o"
+"aquaregulate\stm32f0xx_hal_uart_ex.o"
+"aquaregulate\stm32f0xx_hal_rcc.o"
+"aquaregulate\stm32f0xx_hal_rcc_ex.o"
+"aquaregulate\stm32f0xx_hal.o"
+"aquaregulate\stm32f0xx_hal_i2c.o"
+"aquaregulate\stm32f0xx_hal_i2c_ex.o"
+"aquaregulate\stm32f0xx_hal_gpio.o"
+"aquaregulate\stm32f0xx_hal_dma.o"
+"aquaregulate\stm32f0xx_hal_cortex.o"
+"aquaregulate\stm32f0xx_hal_pwr.o"
+"aquaregulate\stm32f0xx_hal_pwr_ex.o"
+"aquaregulate\stm32f0xx_hal_flash.o"
+"aquaregulate\stm32f0xx_hal_flash_ex.o"
+"aquaregulate\stm32f0xx_hal_exti.o"
+"aquaregulate\system_stm32f0xx.o"
+--strict --scatter "AquaRegulate\AquaRegulate.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "AquaRegulate.map" -o AquaRegulate\AquaRegulate.axf
