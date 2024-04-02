@@ -3,8 +3,8 @@
  ******************************************************************************
  * @file           : main.c
  * @brief          : Main program body
- * Name: Khoi Nguyen
- * Date: 03/03/2024
+ * Name: AquaRegulate
+ * Date: 04/01/2024
  * School: The Univeristy of Utah
  ******************************************************************************
  * @attention
@@ -57,17 +57,15 @@ PB11 -> RX */
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-void sendChar(char);
-void stringArray(char[]);
-
-// please comment out this line for part 1
-void USART3_4_IRQHandler(void);
+void SetEnable();
+void InitializeLEDPins();
+void Calibration();
+void EnableADC();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-char temp, number;
-int flag;
+
 /* USER CODE END 0 */
 
 /**
@@ -76,185 +74,44 @@ int flag;
  */
 int main(void)
 {
+	// Basic Setup
 	HAL_Init();
 	SystemClock_Config();
 
-	// Enable GPIOB, GPIOC and USART3
-	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
-	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+	// Initialize the LED pins to output.
+	SetEnable();
+	InitializeLEDPins();
 
-	// USART3 setup
-	USART3->BRR |= 8000000 / 115200; // set baud rate to 115200
-	USART3->CR1 |= USART_CR1_TE; // enable transmission
+	// Select a GPIO pin to use as the ADC input. (PC0)
+	// Configure to Analog mode
+	GPIOC->MODER |= (GPIO_MODER_MODER0_1 | GPIO_MODER_MODER0_0);
+	// No pull-up, pull-down
+	GPIOC->PUPDR &= ~(GPIO_PUPDR_PUPDR0_1 | GPIO_PUPDR_PUPDR0_0);
 
-	USART3->CR1 |= USART_CR1_RE; // enable reception
-	USART3->CR1 |= USART_CR1_UE | USART_CR1_RXNEIE; // enable USART3 and enable RXNE interrupt
+	// Configure the ADC.
+	// 8-bit resolution
+	ADC1->CFGR1 |= ADC_CFGR1_RES_1;
+	ADC1->CFGR1 &= ~ADC_CFGR1_RES_0;
+	// Continuous conversion mode
+	ADC1->CFGR1 |= ADC_CFGR1_CONT;
+	// Hardware triggers disabled
+	ADC1->CFGR1 &= ~ADC_CFGR1_EXTEN;
 
-	// Set alternate function mode for pb10 and pb11
-	GPIOB->AFR[1] |= (4 << 8);
-	GPIOB->AFR[1] |= (4 << 12);
-	GPIOB->MODER |= (2 << 20);
-	GPIOB->MODER |= (2 << 22);
+	// Select/enable the input pin’s channel for ADC conversion.
+	ADC1->CHSELR |= ADC_CHSELR_CHSEL10;
 
-	// Initialize LED pins
-	GPIOC->MODER |= (1 << 12) | 
-					(1 << 18) | 
-					(1 << 14) | 
-					(1 << 16);
+  	// Perform a self-calibration, enable, and start the ADC.
+    Calibration();
+    EnableADC();
+    // Start ADC.
+    ADC1->CR |= ADC_CR_ADSTART;
 
-	GPIOC->MODER &= ~(1 << 13);
-	GPIOC->MODER &= ~(1 << 19);
-	GPIOC->MODER &= ~(1 << 15);
-	GPIOC->MODER &= ~(1 << 17);
-
-	// Set to output mode
-	GPIOC->OTYPER &= ~(1 << 13);
-	GPIOC->OTYPER &= ~(1 << 12);
-	GPIOC->OTYPER &= ~(1 << 18);
-	GPIOC->OTYPER &= ~(1 << 19);
-	GPIOC->OTYPER &= ~(1 << 14);
-	GPIOC->OTYPER &= ~(1 << 15);
-	GPIOC->OTYPER &= ~(1 << 16);
-	GPIOC->OTYPER &= ~(1 << 17);
-
-	// Set to low speed
-	GPIOC->OSPEEDR &= ~(1 << 12);
-	GPIOC->OSPEEDR &= ~(1 << 18);
-	GPIOC->OSPEEDR &= ~(1 << 14);
-	GPIOC->OSPEEDR &= ~(1 << 16);
-
-	// Set to no pull-up, no pull-down
-	GPIOC->PUPDR &= ~(1 << 13);
-	GPIOC->PUPDR &= ~(1 << 12);
-	GPIOC->PUPDR &= ~(1 << 18);
-	GPIOC->PUPDR &= ~(1 << 19);
-	GPIOC->PUPDR &= ~(1 << 14);
-	GPIOC->PUPDR &= ~(1 << 15);
-	GPIOC->PUPDR &= ~(1 << 16);
-	GPIOC->PUPDR &= ~(1 << 17);
-
-	// Enable USART3_4_IRQn
-	NVIC_EnableIRQ(USART3_4_IRQn);
-
-	char tempPart1;
-	flag = 0;
-	while (1)
-	{
-		// sendChar('a');
-		// stringArray("abc");
-		// Part 1
-		// if (USART3->ISR & (1 << 5)) {
-		// 	tempPart1 = USART3->RDR;
-		// 	if(tempPart1 == 'r') {
-		// 		GPIOC->ODR ^= (1 << 6);
-		// 	}
-		// 	else if(tempPart1 == 'b') {
-		// 		GPIOC->ODR ^= (1 << 7);
-		// 	}
-		// 	else if(tempPart1 == 'g') {
-		// 		GPIOC->ODR ^= (1 << 9);
-		// 	}
-		// 	else if(tempPart1 == 'o') {
-		// 		GPIOC->ODR ^= (1 << 8);
-		// 	}
-		// 	else {
-		// 		stringArray("Wrong Key");
-		// 	}
-		// }
-
-		// Part 2
-
-		stringArray("CMD?");
-
-		HAL_Delay(400);
-	}
-	/* USER CODE END 3 */
-}
-
-// Sending a character
-void sendChar(char symbol)
-{
-	while (!(USART3->ISR & (1 << 7)))
-	{
-	}
-
-	USART3->TDR = symbol;
-}
-
-// Sending a string
-void stringArray(char charArr[])
-{
-	int i = 0;
-	while (charArr[i] != 0)
-	{
-		sendChar(charArr[i]);
-		i++;
+	// Read the ADC data register and turn on/off LEDs depending on the value.
+	while (1) {
+		SetLEDSByADC();
 	}
 }
 
-// Interrupt handler
-void USART3_4_IRQHandler(void)
-{
-	if (flag == 0)
-	{
-		temp = USART3->RDR;
-		flag = 1;
-	}
-	else if (flag == 1)
-	{
-		number = USART3->RDR;
-		flag = 0;
-		if (temp == 'r')
-		{
-			if (number == '0')
-				GPIOC->ODR &= ~(1 << 6);
-			else if (number == '1')
-				GPIOC->ODR |= (1 << 6);
-			else if (number == '2')
-				GPIOC->ODR ^= (1 << 6);
-			else
-				stringArray("Wrong Key");
-		}
-		else if (temp == 'b')
-		{
-			if (number == '0')
-				GPIOC->ODR &= ~(1 << 7);
-			else if (number == '1')
-				GPIOC->ODR |= (1 << 7);
-			else if (number == '2')
-				GPIOC->ODR ^= (1 << 7);
-			else
-				stringArray("Wrong Key");
-		}
-		else if (temp == 'g')
-		{
-			if (number == '0')
-				GPIOC->ODR &= ~(1 << 9);
-			else if (number == '1')
-				GPIOC->ODR |= (1 << 9);
-			else if (number == '2')
-				GPIOC->ODR ^= (1 << 9);
-			else
-				stringArray("Wrong Key");
-		}
-		else if (temp == 'o')
-		{
-			if (number == '0')
-				GPIOC->ODR &= ~(1 << 8);
-			else if (number == '1')
-				GPIOC->ODR |= (1 << 8);
-			else if (number == '2')
-				GPIOC->ODR ^= (1 << 8);
-			else
-				stringArray("Wrong Key");
-		}
-		else
-		{
-			stringArray("Wrong Key");
-		}
-	}
-}
 
 /**
  * @brief System Clock Configuration
@@ -291,7 +148,82 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void SetEnable()
+{
+  RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+  RCC->APB2ENR |= RCC_APB2ENR_ADCEN;
+  RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+}
 
+void InitializeLEDPins()
+{
+  GPIO_InitTypeDef initStr = {GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
+                              GPIO_MODE_OUTPUT_PP,
+                              GPIO_SPEED_FREQ_LOW,
+                              GPIO_NOPULL};
+  HAL_GPIO_Init(GPIOC, &initStr);
+}
+
+void Calibration()
+{
+  /* (1) Ensure that ADEN = 0 */
+  /* (2) Clear ADEN by setting ADDIS */
+  /* (3) Clear DMAEN */
+  /* (4) Launch the calibration by setting ADCAL */
+  /* (5) Wait until ADCAL=0 */
+  if ((ADC1->CR & ADC_CR_ADEN) != 0) /* (1) */ {
+    ADC1->CR |= ADC_CR_ADDIS; /* (2) */
+  }
+  while ((ADC1->CR & ADC_CR_ADEN) != 0);
+  ADC1->CFGR1 &= ~ADC_CFGR1_DMAEN; /* (3) */
+  ADC1->CR |= ADC_CR_ADCAL; /* (4) */
+  while ((ADC1->CR & ADC_CR_ADCAL) != 0); /* (5) */
+}
+
+void EnableADC()
+{
+  /* Enable the ADC */
+  /* (1) Ensure that ADRDY = 0 */
+  /* (2) Clear ADRDY */
+  /* (3) Enable the ADC */
+  /* (4) Wait until ADC ready */
+  if (ADC1->ISR & ADC_ISR_ADRDY) /* (1) */ {
+    ADC1->ISR |= ADC_ISR_ADRDY; /* (2) */
+  }
+  ADC1->CR |= ADC_CR_ADEN; /* (3) */
+  while (!(ADC1->ISR & ADC_ISR_ADRDY)); /* (4) */    
+}
+
+void SetLEDSByADC()
+{
+  int threshold1 = 0;
+  int threshold2 = 65;
+  int threshold3 = 130;
+  int threshold4 = 250;
+
+  // Reset all LEDs
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_RESET);
+
+  if (ADC1->DR > threshold1 && ADC1->DR <= threshold2) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+  }
+  else if (ADC1->DR > threshold2 && ADC1->DR <= threshold3) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+  }
+  else if (ADC1->DR > threshold3 && ADC1->DR <= threshold4) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+  }
+  else if (ADC1->DR > threshold4) {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+  }
+  else {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+  }
+}
 /* USER CODE END 4 */
 
 /**
