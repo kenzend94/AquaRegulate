@@ -22,6 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f072xb.h"
+#include "stdio.h"
 
 /* STM32F072RB
 PB10 -> TX
@@ -61,11 +62,17 @@ void SetEnable();
 void InitializeLEDPins();
 void Calibration();
 void EnableADC();
+void SetLEDSByADC();
+
+void TransmitMoistureValue();
+uint32_t temp_sensor_value;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void USART3_4_IRQHandler()
+{
+}
 /* USER CODE END 0 */
 
 /**
@@ -74,6 +81,7 @@ void EnableADC();
  */
 int main(void)
 {
+	/************ ADC START ************/
 	// Basic Setup
 	HAL_Init();
 	SystemClock_Config();
@@ -105,9 +113,42 @@ int main(void)
     EnableADC();
     // Start ADC.
     ADC1->CR |= ADC_CR_ADSTART;
+	/************ ADC END ************/
+	printf("Hello kid from South Koera");
+	/************ UART START ************/
+	unsigned int baud_rate = 115200;
+
+	// Enable the system clock to the desired USART in the RCC peripheral.
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;  // Enable USART3 clock
+	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;   // Enable GPIOB clock
+
+	// 4.1 Preparing to use the USART
+	// PB10 - USART3_TX, PB11 - USART3_RX
+	// Set MODER to Alternate Function mode
+	GPIOB->MODER |= (GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1);
+	GPIOB->MODER &= ~(GPIO_MODER_MODER10_0 | GPIO_MODER_MODER11_0);
+	GPIOB->OTYPER &= ~(GPIO_OTYPER_OT_10 | GPIO_OTYPER_OT_11);
+	GPIOB->OSPEEDR &= ~(GPIO_OSPEEDR_OSPEEDR10 | GPIO_OSPEEDR_OSPEEDR11);
+	GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR10 | GPIO_PUPDR_PUPDR11);
+
+	GPIOB->AFR[1] |= ((4 << 8) | (4 << 12));
+
+	// Set the Baud rate for communication to be 115200 bits/second.
+	USART3->BRR = (uint16_t)(HAL_RCC_GetHCLKFreq() / baud_rate); // 69
+	USART3->CR1 |= (USART_CR1_TE | USART_CR1_RE);    // Enable Receiver
+	USART3->CR1 |= USART_CR1_UE;                     // Enable USART
+	USART3->CR1 |= USART_CR1_RXNEIE;
+
+	// 4.3 Interrupt-Based Reception
+	NVIC_EnableIRQ(USART3_4_IRQn);
+	/************ UART END ************/
 
 	// Read the ADC data register and turn on/off LEDs depending on the value.
 	while (1) {
+		printf("Hello kid from South Koera");
+		printf("ADC1->DR: %d\n", ADC1->DR);
+
+		temp_sensor_value = ADC1->DR;
 		SetLEDSByADC();
 	}
 }
@@ -202,6 +243,10 @@ void SetLEDSByADC()
   int threshold3 = 130;
   int threshold4 = 250;
 
+  // print ADC1->DR to the console
+
+  printf("ADC1->DR: %d\n", ADC1->DR);
+
   // Reset all LEDs
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_RESET);
 
@@ -223,6 +268,14 @@ void SetLEDSByADC()
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
   }
+}
+
+void TransmitMoistureValue() 
+{
+	while (!(USART3->ISR & USART_ISR_TXE)); // exits once the flag is set.
+	
+	// Transmit lower byte of ADC value.
+	USART3->TDR = temp_sensor_value & 0xFF;  
 }
 /* USER CODE END 4 */
 
