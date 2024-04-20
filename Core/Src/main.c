@@ -23,12 +23,11 @@
 #include "main.h"
 #include "stm32f072xb.h"
 #include "stm32f0xx_it.h"
-#include "stdio.h"	
+#include "stdio.h"
 
 /* STM32F072RB
 PB10 -> TX
 PB11 -> RX */
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -65,14 +64,28 @@ void Calibration();
 void EnableADC();
 void SetLEDSByADC();
 
+// void TransmitMoistureValue(uint32_t temp_sensor_value);
 void TransmitMoistureValue();
+
 uint32_t temp_sensor_value;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void USART3_4_IRQHandler()
+void TransmitChar(char c)
 {
+  while (!(USART3->ISR & USART_ISR_TXE)); // exits once the flag is set.
+
+  // Write the character into the transmit data register.
+  USART3->TDR = c;
+}
+
+void TransmitString(char* str)
+{
+  for (int i = 0; str[i] != '\0'; i++)
+  {
+    TransmitChar(str[i]);
+  }
 }
 /* USER CODE END 0 */
 
@@ -109,19 +122,19 @@ int main(void)
 	// Select/enable the input pin’s channel for ADC conversion.
 	ADC1->CHSELR |= ADC_CHSELR_CHSEL10;
 
-  	// Perform a self-calibration, enable, and start the ADC.
-    Calibration();
-    EnableADC();
-    // Start ADC.
-    ADC1->CR |= ADC_CR_ADSTART;
+	// Perform a self-calibration, enable, and start the ADC.
+	Calibration();
+	EnableADC();
+	// Start ADC.
+	ADC1->CR |= ADC_CR_ADSTART;
 	/************ ADC END ************/
-	//printf("Hello kid from South Koera");
+	// printf("Hello kid from South Koera");
 	/************ UART START ************/
 	unsigned int baud_rate = 115200;
 
 	// Enable the system clock to the desired USART in the RCC peripheral.
-	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;  // Enable USART3 clock
-	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;   // Enable GPIOB clock
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN; // Enable USART3 clock
+	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;	  // Enable GPIOB clock
 
 	// 4.1 Preparing to use the USART
 	// PB10 - USART3_TX, PB11 - USART3_RX
@@ -136,8 +149,8 @@ int main(void)
 
 	// Set the Baud rate for communication to be 115200 bits/second.
 	USART3->BRR = (uint16_t)(HAL_RCC_GetHCLKFreq() / baud_rate); // 69
-	USART3->CR1 |= (USART_CR1_TE | USART_CR1_RE);    // Enable Receiver
-	USART3->CR1 |= USART_CR1_UE;                     // Enable USART
+	USART3->CR1 |= (USART_CR1_TE | USART_CR1_RE);				 // Enable Receiver
+	USART3->CR1 |= USART_CR1_UE;								 // Enable USART
 	USART3->CR1 |= USART_CR1_RXNEIE;
 
 	// 4.3 Interrupt-Based Reception
@@ -145,13 +158,14 @@ int main(void)
 	/************ UART END ************/
 
 	// Read the ADC data register and turn on/off LEDs depending on the value.
-	while (1) {
+	while (1)
+	{
 		temp_sensor_value = ADC1->DR;
 		// SetLEDSByADC();
 		TransmitMoistureValue();
+		// TransmitMoistureValue(temp_sensor_value);
 	}
 }
-
 
 /**
  * @brief System Clock Configuration
@@ -190,92 +204,100 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void SetEnable()
 {
-  RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-  RCC->APB2ENR |= RCC_APB2ENR_ADCEN;
-  RCC->APB1ENR |= RCC_APB1ENR_DACEN;
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+	RCC->APB2ENR |= RCC_APB2ENR_ADCEN;
+	RCC->APB1ENR |= RCC_APB1ENR_DACEN;
 }
 
 void InitializeLEDPins()
 {
-  GPIO_InitTypeDef initStr = {GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
-                              GPIO_MODE_OUTPUT_PP,
-                              GPIO_SPEED_FREQ_LOW,
-                              GPIO_NOPULL};
-  HAL_GPIO_Init(GPIOC, &initStr);
+	GPIO_InitTypeDef initStr = {GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
+								GPIO_MODE_OUTPUT_PP,
+								GPIO_SPEED_FREQ_LOW,
+								GPIO_NOPULL};
+	HAL_GPIO_Init(GPIOC, &initStr);
 }
 
 void Calibration()
 {
-  /* (1) Ensure that ADEN = 0 */
-  /* (2) Clear ADEN by setting ADDIS */
-  /* (3) Clear DMAEN */
-  /* (4) Launch the calibration by setting ADCAL */
-  /* (5) Wait until ADCAL=0 */
-  if ((ADC1->CR & ADC_CR_ADEN) != 0) /* (1) */ {
-    ADC1->CR |= ADC_CR_ADDIS; /* (2) */
-  }
-  while ((ADC1->CR & ADC_CR_ADEN) != 0);
-  ADC1->CFGR1 &= ~ADC_CFGR1_DMAEN; /* (3) */
-  ADC1->CR |= ADC_CR_ADCAL; /* (4) */
-  while ((ADC1->CR & ADC_CR_ADCAL) != 0); /* (5) */
+	/* (1) Ensure that ADEN = 0 */
+	/* (2) Clear ADEN by setting ADDIS */
+	/* (3) Clear DMAEN */
+	/* (4) Launch the calibration by setting ADCAL */
+	/* (5) Wait until ADCAL=0 */
+	if ((ADC1->CR & ADC_CR_ADEN) != 0) /* (1) */
+	{
+		ADC1->CR |= ADC_CR_ADDIS; /* (2) */
+	}
+	while ((ADC1->CR & ADC_CR_ADEN) != 0)
+		;
+	ADC1->CFGR1 &= ~ADC_CFGR1_DMAEN; /* (3) */
+	ADC1->CR |= ADC_CR_ADCAL;		 /* (4) */
+	while ((ADC1->CR & ADC_CR_ADCAL) != 0)
+		; /* (5) */
 }
 
 void EnableADC()
 {
-  /* Enable the ADC */
-  /* (1) Ensure that ADRDY = 0 */
-  /* (2) Clear ADRDY */
-  /* (3) Enable the ADC */
-  /* (4) Wait until ADC ready */
-  if (ADC1->ISR & ADC_ISR_ADRDY) /* (1) */ {
-    ADC1->ISR |= ADC_ISR_ADRDY; /* (2) */
-  }
-  ADC1->CR |= ADC_CR_ADEN; /* (3) */
-  while (!(ADC1->ISR & ADC_ISR_ADRDY)); /* (4) */    
+	/* Enable the ADC */
+	/* (1) Ensure that ADRDY = 0 */
+	/* (2) Clear ADRDY */
+	/* (3) Enable the ADC */
+	/* (4) Wait until ADC ready */
+	if (ADC1->ISR & ADC_ISR_ADRDY) /* (1) */
+	{
+		ADC1->ISR |= ADC_ISR_ADRDY; /* (2) */
+	}
+	ADC1->CR |= ADC_CR_ADEN; /* (3) */
+	while (!(ADC1->ISR & ADC_ISR_ADRDY))
+		; /* (4) */
 }
 
 void SetLEDSByADC()
 {
-  int threshold1 = 0;
-  int threshold2 = 65;
-  int threshold3 = 130;
-  int threshold4 = 250;
+	int threshold1 = 0;
+	int threshold2 = 65;
+	int threshold3 = 130;
+	int threshold4 = 250;
 
-  // print ADC1->DR to the console
+	// Reset all LEDs
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_RESET);
 
-  printf("ADC1->DR: %d\n", ADC1->DR);
-
-  // Reset all LEDs
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_RESET);
-
-  if (ADC1->DR > threshold1 && ADC1->DR <= threshold2) {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-  }
-  else if (ADC1->DR > threshold2 && ADC1->DR <= threshold3) {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
-  }
-  else if (ADC1->DR > threshold3 && ADC1->DR <= threshold4) {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-  }
-  else if (ADC1->DR > threshold4) {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-  }
-  else {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-  }
+	if (ADC1->DR > threshold1 && ADC1->DR <= threshold2)
+	{
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+	}
+	else if (ADC1->DR > threshold2 && ADC1->DR <= threshold3)
+	{
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+	}
+	else if (ADC1->DR > threshold3 && ADC1->DR <= threshold4)
+	{
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+	}
+	else if (ADC1->DR > threshold4)
+	{
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+	}
 }
 
-void TransmitMoistureValue() 
+void TransmitMoistureValue()
 {
-	while (!(USART3->ISR & USART_ISR_TXE)); // exits once the flag is set.
-
-	// Transmit lower byte of ADC value.
-	USART3->TDR = temp_sensor_value & 0xFF;  
+	// Convert temp_sensor_value from hex to dec
+	char str[10];
+    sprintf(str, "%d", temp_sensor_value);
+	TransmitString(str);
 }
+
+
 /* USER CODE END 4 */
 
 /**

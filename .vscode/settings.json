@@ -8,7 +8,10 @@
     "files.associations": {
         "stm32f072xb.h": "c",
         "stm32f0xx_it.h": "c",
-        "stm32f0xx_hal_rcc.h": "c"
+        "stm32f0xx_hal_rcc.h": "c",
+        "vector": "c",
+        "xstring": "c",
+        "xutility": "c"
     },
     "idf.portWin": "COM8",
     "idf.flashType": "UART"

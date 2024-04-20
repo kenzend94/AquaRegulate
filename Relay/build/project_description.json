@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "Relay",
-    "project_version":    "012c5d5-dirty",
+    "project_version":    "8ca6ed3-dirty",
     "project_path":       "E:/AquaRegulate/Relay",
     "idf_path":           "C:/Users/kenze/esp/v5.2.1/esp-idf",
     "build_dir":          "E:/AquaRegulate/Relay/build",

@@ -39,7 +39,9 @@ void app_main(void)
         uart_write_bytes(UART_NUM, (const char*) data, len);
 
         // esp_log_write
-        // printf("Received %d bytes: %s\n", len, data);P
         esp_log_write(ESP_LOG_ERROR, "UART", "Received %d bytes: %s\n", len, data);
+
+        // export esp_log_write to .txt file
+        
     }
 }
