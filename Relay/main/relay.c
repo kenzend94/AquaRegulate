@@ -6,7 +6,7 @@
 
 #define RELAY_PIN1 GPIO_NUM_8
 #define RELAY_PIN2 GPIO_NUM_10
-#define RELAY_PIN3 GPIO_NUM_11
+#define RELAY_PIN3 GPIO_NUM_17
 
 void app_main(void)
 {

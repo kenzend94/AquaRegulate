@@ -292,8 +292,8 @@ void SetLEDSByADC()
 void TransmitMoistureValue()
 {
 	// Convert temp_sensor_value from hex to dec
-	char str[10];
-    sprintf(str, "%d", temp_sensor_value);
+	char str[8];
+    sprintf(str, "%d\n", temp_sensor_value);
 	TransmitString(str);
 }
 
