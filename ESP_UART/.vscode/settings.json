@@ -10,7 +10,7 @@
     "idf.espIdfPathWin": "C:\\Users\\kenze\\esp\\v5.2.1\\esp-idf",
     "idf.openOcdConfigs": [
         "interface/ftdi/esp32_devkitj_v1.cfg",
-        "target/esp32.cfg"
+        "target/esp32s3.cfg"
     ],
     "idf.portWin": "COM8",
     "idf.pythonBinPathWin": "C:\\Users\\kenze\\.espressif\\python_env\\idf5.2_py3.11_env\\Scripts\\python.exe",

@@ -22,7 +22,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f072xb.h"
-#include "stdio.h"
+#include "stm32f0xx_it.h"
+#include "stdio.h"	
 
 /* STM32F072RB
 PB10 -> TX
@@ -114,7 +115,7 @@ int main(void)
     // Start ADC.
     ADC1->CR |= ADC_CR_ADSTART;
 	/************ ADC END ************/
-	printf("Hello kid from South Koera");
+	//printf("Hello kid from South Koera");
 	/************ UART START ************/
 	unsigned int baud_rate = 115200;
 
@@ -145,11 +146,9 @@ int main(void)
 
 	// Read the ADC data register and turn on/off LEDs depending on the value.
 	while (1) {
-		printf("Hello kid from South Koera");
-		printf("ADC1->DR: %d\n", ADC1->DR);
-
 		temp_sensor_value = ADC1->DR;
-		SetLEDSByADC();
+		// SetLEDSByADC();
+		TransmitMoistureValue();
 	}
 }
 
@@ -273,7 +272,7 @@ void SetLEDSByADC()
 void TransmitMoistureValue() 
 {
 	while (!(USART3->ISR & USART_ISR_TXE)); // exits once the flag is set.
-	
+
 	// Transmit lower byte of ADC value.
 	USART3->TDR = temp_sensor_value & 0xFF;  
 }

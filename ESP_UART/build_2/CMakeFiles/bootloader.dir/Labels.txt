@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+E:/AquaRegulate/ESP_UART/build/CMakeFiles/bootloader
+E:/AquaRegulate/ESP_UART/build/CMakeFiles/bootloader.rule
+E:/AquaRegulate/ESP_UART/build/CMakeFiles/bootloader-complete.rule
+E:/AquaRegulate/ESP_UART/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+E:/AquaRegulate/ESP_UART/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+E:/AquaRegulate/ESP_UART/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+E:/AquaRegulate/ESP_UART/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+E:/AquaRegulate/ESP_UART/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+E:/AquaRegulate/ESP_UART/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+E:/AquaRegulate/ESP_UART/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

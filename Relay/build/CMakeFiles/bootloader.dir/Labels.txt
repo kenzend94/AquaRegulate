@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+E:/AquaRegulate/Relay/build/CMakeFiles/bootloader
+E:/AquaRegulate/Relay/build/CMakeFiles/bootloader.rule
+E:/AquaRegulate/Relay/build/CMakeFiles/bootloader-complete.rule
+E:/AquaRegulate/Relay/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+E:/AquaRegulate/Relay/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+E:/AquaRegulate/Relay/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+E:/AquaRegulate/Relay/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+E:/AquaRegulate/Relay/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+E:/AquaRegulate/Relay/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+E:/AquaRegulate/Relay/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

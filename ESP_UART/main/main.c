@@ -8,7 +8,7 @@
 #define UART_NUM UART_NUM_0
 #define BUF_SIZE 1024
 #define RX_PIN 44
-#define TX_PIN 43
+#define TX_PIN 43   
 
 void app_main(void)
 {
