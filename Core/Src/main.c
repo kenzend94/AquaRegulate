@@ -128,7 +128,7 @@ int main(void)
 	// Start ADC.
 	ADC1->CR |= ADC_CR_ADSTART;
 	/************ ADC END ************/
-	// printf("Hello kid from South Koera");
+
 	/************ UART START ************/
 	unsigned int baud_rate = 115200;
 
@@ -149,12 +149,19 @@ int main(void)
 
 	// Set the Baud rate for communication to be 115200 bits/second.
 	USART3->BRR = (uint16_t)(HAL_RCC_GetHCLKFreq() / baud_rate); // 69
+	// Set parity and word length
+    USART3->CR1 &= ~USART_CR1_M; // 8 data bits
+    USART3->CR1 &= ~USART_CR1_PCE; // Disable parity control
+	USART3->CR2 &= ~USART_CR2_STOP; // 1 stop bit
+    USART2->CR3 &= ~(USART_CR3_RTSE | USART_CR3_CTSE);  // Disable flow control
+
+
 	USART3->CR1 |= (USART_CR1_TE | USART_CR1_RE);				 // Enable Receiver
 	USART3->CR1 |= USART_CR1_UE;								 // Enable USART
 	USART3->CR1 |= USART_CR1_RXNEIE;
 
-	// 4.3 Interrupt-Based Reception
-	NVIC_EnableIRQ(USART3_4_IRQn);
+	// // 4.3 Interrupt-Based Reception
+	// NVIC_EnableIRQ(USART3_4_IRQn);
 	/************ UART END ************/
 
 	// Read the ADC data register and turn on/off LEDs depending on the value.
@@ -163,7 +170,6 @@ int main(void)
 		temp_sensor_value = ADC1->DR;
 		// SetLEDSByADC();
 		TransmitMoistureValue();
-		// TransmitString("hello");
 	}
 }
 
@@ -250,8 +256,7 @@ void EnableADC()
 		ADC1->ISR |= ADC_ISR_ADRDY; /* (2) */
 	}
 	ADC1->CR |= ADC_CR_ADEN; /* (3) */
-	while (!(ADC1->ISR & ADC_ISR_ADRDY))
-		; /* (4) */
+	while (!(ADC1->ISR & ADC_ISR_ADRDY)); /* (4) */
 }
 
 void SetLEDSByADC()
