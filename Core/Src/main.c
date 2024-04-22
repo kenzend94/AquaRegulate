@@ -163,7 +163,7 @@ int main(void)
 		temp_sensor_value = ADC1->DR;
 		// SetLEDSByADC();
 		TransmitMoistureValue();
-		// TransmitMoistureValue(temp_sensor_value);
+		// TransmitString("hello");
 	}
 }
 
@@ -293,7 +293,7 @@ void TransmitMoistureValue()
 {
 	// Convert temp_sensor_value from hex to dec
 	char str[8];
-    sprintf(str, "%d\n", temp_sensor_value);
+    sprintf(str, "%d", temp_sensor_value);
 	TransmitString(str);
 }
 
