@@ -114,6 +114,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
   /* USER CODE END USART1_MspInit 1 */
   }
 
+  
+
 }
 
 /**

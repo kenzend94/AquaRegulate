@@ -17,7 +17,7 @@ void app_main(void)
         .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
+        .stop_bits = UART_STOPBITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
     };
     uart_param_config(UART_NUM, &uart_config);
@@ -32,11 +32,13 @@ void app_main(void)
     uint8_t* data = (uint8_t*) malloc(BUF_SIZE);
 
     while(1) {
+        memset(data, 0, sizeof(data));  // Clear the buffer
+
         // Read data from UART with a timeout of 20 milliseconds
-        int len = uart_read_bytes(UART_NUM, data, BUF_SIZE, 20);
+        int len = uart_read_bytes(UART_NUM, data, BUF_SIZE, 1000);
         
         // Write data back to UART
-        uart_write_bytes(UART_NUM, (const char*) data, len);
+        uart_write_bytes(UART_NUM, (const char*) data, strlen(data));
 
         // esp_log_write
         // printf("Received %d bytes: %s\n", len, data);P
