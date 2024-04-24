@@ -227,17 +227,6 @@ void init_UART()
 {
 	// Enable UART Clock
 	__HAL_RCC_USART3_CLK_ENABLE();
-	// __HAL_RCC_GPIOB_CLK_ENABLE();
-
-	// // GPIO Configuration
-	// GPIO_InitTypeDef GPIO_InitStruct = {0};
-	// GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
-	// GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	// GPIO_InitStruct.Pull = GPIO_NOPULL;
-	// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	// GPIO_InitStruct.Alternate = GPIO_AF4_USART3;
-	// HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
 
 	// UART Configuration
 	huart3.Instance = USART3;
