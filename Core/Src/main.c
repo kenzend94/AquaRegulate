@@ -124,22 +124,6 @@ void SystemClock_Config(void)
 }
 
 
-void EnableADC()
-{
-	/* Enable the ADC */
-	/* (1) Ensure that ADRDY = 0 */
-	/* (2) Clear ADRDY */
-	/* (3) Enable the ADC */
-	/* (4) Wait until ADC ready */
-	if (ADC1->ISR & ADC_ISR_ADRDY) /* (1) */
-	{
-		ADC1->ISR |= ADC_ISR_ADRDY; /* (2) */
-	}
-	ADC1->CR |= ADC_CR_ADEN; /* (3) */
-	while (!(ADC1->ISR & ADC_ISR_ADRDY))
-		; /* (4) */
-}
-
 void TransmitMoistureValue()
 {
 	// Convert temp_sensor_value from hex to dec
