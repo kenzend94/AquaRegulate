@@ -78,9 +78,16 @@ int main(void)
 	// Read the ADC data register and turn on/off LEDs depending on the value.
 	while (1)
 	{
-		temp_sensor_value = ADC1->DR;
-		// SetLEDSByADC();
-		TransmitMoistureValue();
+		// Get the ADC value
+		if (HAL_ADC_PollForConversion(&hadc, 1000) == HAL_OK)
+		{
+			temp_sensor_value = HAL_ADC_GetValue(&hadc);
+			// SetLEDSByADC();
+			TransmitMoistureValue();
+
+			// Delay for 1 second
+			HAL_Delay(10000);
+		}
 	}
 }
 
@@ -250,15 +257,6 @@ void Start_UART()
 	}
 }
 
-void Start_ADC(void)
-{
-	// Start ADC conversion
-	if (HAL_ADC_Start(&hadc) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
-
 void init_GPIO(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -325,6 +323,16 @@ void init_ADC()
 
 	// Start the ADC
 	Start_ADC();
+}
+
+
+void Start_ADC(void)
+{
+	// Start ADC conversion
+	if (HAL_ADC_Start(&hadc) != HAL_OK)
+	{
+		Error_Handler();
+	}
 }
 
 void TransmitString(char *str)
