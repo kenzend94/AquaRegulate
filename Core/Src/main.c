@@ -219,35 +219,7 @@ void TransmitChar(char c)
 
 void init_UART()
 {
-	// unsigned int baud_rate = 115200;
-
-	// // Enable the system clock to the desired USART in the RCC peripheral.
-	// RCC->APB1ENR |= RCC_APB1ENR_USART3EN; // Enable USART3 clock
-	// RCC->AHBENR |= RCC_AHBENR_GPIOBEN;	  // Enable GPIOB clock
-
-	// // 4.1 Preparing to use the USART
-	// // PB10 - USART3_TX, PB11 - USART3_RX
-	// // Set MODER to Alternate Function mode
-	// GPIOB->MODER |= (GPIO_MODER_MODER10_1 | GPIO_MODER_MODER11_1);
-	// GPIOB->MODER &= ~(GPIO_MODER_MODER10_0 | GPIO_MODER_MODER11_0);
-	// GPIOB->OTYPER &= ~(GPIO_OTYPER_OT_10 | GPIO_OTYPER_OT_11);
-	// GPIOB->OSPEEDR &= ~(GPIO_OSPEEDR_OSPEEDR10 | GPIO_OSPEEDR_OSPEEDR11);
-	// GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR10 | GPIO_PUPDR_PUPDR11);
-
-	// GPIOB->AFR[1] |= ((4 << 8) | (4 << 12));
-
-	// // Set the Baud rate for communication to be 115200 bits/second.
-	// USART3->BRR = (uint16_t)(HAL_RCC_GetHCLKFreq() / baud_rate); // 69
-	// 															 // Set parity and word length
-	// USART3->CR1 &= ~USART_CR1_M;								 // 8 data bits
-	// USART3->CR1 &= ~USART_CR1_PCE;								 // Disable parity control
-	// USART3->CR2 &= ~USART_CR2_STOP;								 // 1 stop bit
-	// USART2->CR3 &= ~(USART_CR3_RTSE | USART_CR3_CTSE);			 // Disable flow control
-
-	// USART3->CR1 |= (USART_CR1_TE | USART_CR1_RE); // Enable Receiver
-	// USART3->CR1 |= USART_CR1_UE;				  // Enable USART
-	// USART3->CR1 |= USART_CR1_RXNEIE;
-
+	// Enable UART Clock
 	__HAL_RCC_USART3_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -293,29 +265,6 @@ void Start_ADC(void)
 
 void init_ADC()
 {
-	// // Select a GPIO pin to use as the ADC input. (PC0)
-	// // Configure to Analog mode
-	// GPIOC->MODER |= (GPIO_MODER_MODER0_1 | GPIO_MODER_MODER0_0);
-	// // No pull-up, pull-down
-	// GPIOC->PUPDR &= ~(GPIO_PUPDR_PUPDR0_1 | GPIO_PUPDR_PUPDR0_0);
-
-	// // Configure the ADC.
-	// // 8-bit resolution
-	// ADC1->CFGR1 |= ADC_CFGR1_RES_1;
-	// ADC1->CFGR1 &= ~ADC_CFGR1_RES_0;
-	// // Continuous conversion mode
-	// ADC1->CFGR1 |= ADC_CFGR1_CONT;
-	// // Hardware triggers disabled
-	// ADC1->CFGR1 &= ~ADC_CFGR1_EXTEN;
-
-	// // Select/enable the input pin’s channel for ADC conversion.
-	// ADC1->CHSELR |= ADC_CHSELR_CHSEL10;
-
-	// // Perform a self-calibration, enable, and start the ADC.
-	// Calibration();
-	// EnableADC();
-	// // Start ADC.
-	// ADC1->CR |= ADC_CR_ADSTART;
 
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
