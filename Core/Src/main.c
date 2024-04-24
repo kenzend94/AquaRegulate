@@ -61,10 +61,6 @@ int main(void)
 	HAL_Init();
 	SystemClock_Config();
 
-	// Initialize the LED pins to output.
-	SetEnable();
-	InitializeLEDPins();
-
 	// Initialize the GPIO
 	init_GPIO();
 
@@ -81,9 +77,11 @@ int main(void)
 		// Get the ADC value
 		if (HAL_ADC_PollForConversion(&hadc, 1000) == HAL_OK)
 		{
+			TransmitString("\nADC Value: ");
 			temp_sensor_value = HAL_ADC_GetValue(&hadc);
 			// SetLEDSByADC();
 			TransmitMoistureValue();
+			TransmitString("\nEnd");
 
 			// Delay for 1 second
 			HAL_Delay(10000);
@@ -125,42 +123,6 @@ void SystemClock_Config(void)
 	}
 }
 
-/* USER CODE BEGIN 4 */
-void SetEnable()
-{
-	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-	RCC->APB2ENR |= RCC_APB2ENR_ADCEN;
-	RCC->APB1ENR |= RCC_APB1ENR_DACEN;
-}
-
-void InitializeLEDPins()
-{
-	GPIO_InitTypeDef initStr = {GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
-								GPIO_MODE_OUTPUT_PP,
-								GPIO_SPEED_FREQ_LOW,
-								GPIO_NOPULL};
-	HAL_GPIO_Init(GPIOC, &initStr);
-}
-
-void Calibration()
-{
-	/* (1) Ensure that ADEN = 0 */
-	/* (2) Clear ADEN by setting ADDIS */
-	/* (3) Clear DMAEN */
-	/* (4) Launch the calibration by setting ADCAL */
-	/* (5) Wait until ADCAL=0 */
-	if ((ADC1->CR & ADC_CR_ADEN) != 0) /* (1) */
-	{
-		ADC1->CR |= ADC_CR_ADDIS; /* (2) */
-	}
-	while ((ADC1->CR & ADC_CR_ADEN) != 0)
-		;
-	ADC1->CFGR1 &= ~ADC_CFGR1_DMAEN; /* (3) */
-	ADC1->CR |= ADC_CR_ADCAL;		 /* (4) */
-	while ((ADC1->CR & ADC_CR_ADCAL) != 0)
-		; /* (5) */
-}
 
 void EnableADC()
 {
@@ -176,41 +138,6 @@ void EnableADC()
 	ADC1->CR |= ADC_CR_ADEN; /* (3) */
 	while (!(ADC1->ISR & ADC_ISR_ADRDY))
 		; /* (4) */
-}
-
-void SetLEDSByADC()
-{
-	int threshold1 = 0;
-	int threshold2 = 65;
-	int threshold3 = 130;
-	int threshold4 = 250;
-
-	// Reset all LEDs
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_RESET);
-
-	if (ADC1->DR > threshold1 && ADC1->DR <= threshold2)
-	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-	}
-	else if (ADC1->DR > threshold2 && ADC1->DR <= threshold3)
-	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
-	}
-	else if (ADC1->DR > threshold3 && ADC1->DR <= threshold4)
-	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-	}
-	else if (ADC1->DR > threshold4)
-	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-	}
-	else
-	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-	}
 }
 
 void TransmitMoistureValue()
@@ -262,8 +189,10 @@ void init_GPIO(void)
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     // Enable GPIO clocks
+	__HAL_RCC_GPIOA_CLK_ENABLE(); // For UART
     __HAL_RCC_GPIOB_CLK_ENABLE(); // For UART
     __HAL_RCC_GPIOC_CLK_ENABLE(); // For ADC
+	__HAL_RCC_ADC1_CLK_ENABLE(); // For ADC
 
     // UART GPIO Configuration
     // PB10 -> USART3_TX, PB11 -> USART3_RX
