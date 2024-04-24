@@ -49,6 +49,9 @@ void init_ADC();
 void Start_ADC(void);
 ADC_HandleTypeDef hadc;
 
+// GPIO
+void init_GPIO();
+
 uint32_t temp_sensor_value;
 
 int main(void)
@@ -61,6 +64,9 @@ int main(void)
 	// Initialize the LED pins to output.
 	SetEnable();
 	InitializeLEDPins();
+
+	// Initialize the GPIO
+	init_GPIO();
 
 	// Initialize the ADC
 	init_ADC();
@@ -221,16 +227,17 @@ void init_UART()
 {
 	// Enable UART Clock
 	__HAL_RCC_USART3_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
+	// __HAL_RCC_GPIOB_CLK_ENABLE();
 
-	// GPIO Configuration
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF4_USART3;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	// // GPIO Configuration
+	// GPIO_InitTypeDef GPIO_InitStruct = {0};
+	// GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
+	// GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	// GPIO_InitStruct.Pull = GPIO_NOPULL;
+	// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	// GPIO_InitStruct.Alternate = GPIO_AF4_USART3;
+	// HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 
 	// UART Configuration
 	huart3.Instance = USART3;
@@ -263,20 +270,35 @@ void Start_ADC(void)
 	}
 }
 
+void init_GPIO(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    // Enable GPIO clocks
+    __HAL_RCC_GPIOB_CLK_ENABLE(); // For UART
+    __HAL_RCC_GPIOC_CLK_ENABLE(); // For ADC
+
+    // UART GPIO Configuration
+    // PB10 -> USART3_TX, PB11 -> USART3_RX
+    GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF4_USART3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    // ADC GPIO Configuration
+    // PC0 -> ADC1_IN10
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    // No need to set Speed or Alternate as it's analog mode
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+}
+
 void init_ADC()
 {
-
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-	// Enable GPIO Clock
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-
-	// Configure GPIO pin : PC0
-	GPIO_InitStruct.Pin = GPIO_PIN_0;
-	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
+	// ADC Configuration
 	ADC_ChannelConfTypeDef sConfig = {0};
 
 	// Configure the ADC peripheral
