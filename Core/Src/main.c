@@ -27,14 +27,7 @@ PB11 -> RX */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
-void SetEnable();
-void InitializeLEDPins();
-void Calibration();
-void EnableADC();
-void SetLEDSByADC();
 
-// void TransmitMoistureValue(uint32_t temp_sensor_value);
 void TransmitMoistureValue();
 void TransmitString(char *str);
 void TransmitChar(char c);
