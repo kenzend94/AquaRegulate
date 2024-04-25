@@ -20,12 +20,17 @@
 #include "stm32f0xx_hal_adc.h"
 #include "stm32f0xx_hal_adc_ex.h"
 
+
 /* STM32F072RB
 PB10 -> TX
 PB11 -> RX */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+
+void TransmitMoistureValue();
+void TransmitString(char *str);
+void TransmitChar(char c);
 
 // UART
 static void init_UART();
@@ -40,8 +45,8 @@ ADC_HandleTypeDef hadc;
 // GPIO
 void init_GPIO();
 
-uint32_t temp_sensor_value;
-
+uint32_t sensor_value1;
+uint32_t sensor_value2;
 int main(void)
 {
 	/************ ADC START ************/
@@ -56,22 +61,17 @@ int main(void)
 	init_ADC();
 	init_UART();
 
-	while (1)
-	{
-		// Get the ADC value
-		if (HAL_ADC_PollForConversion(&hadc, 1000) == HAL_OK)
-		{
-			// Convert temp_sensor_value from hex to dec
-			HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value: ", 11, 1000);
-			temp_sensor_value = HAL_ADC_GetValue(&hadc);
-			sprintf((char *)&temp_sensor_value, "%d", temp_sensor_value);
-			HAL_UART_Transmit(&huart3, (uint8_t *)&temp_sensor_value, 4, 1000);
+	// // 4.3 Interrupt-Based Reception
+	// NVIC_EnableIRQ(USART3_4_IRQn);
 
-			HAL_UART_Transmit(&huart3, (uint8_t *)"           ", 11, 1000);
-			// Delay for 1 second
-			HAL_Delay(3000);
-		}
-	}
+	// Read the ADC data register and turn on/off LEDs depending on the value.
+    while (1)
+    {
+
+		TransmitMoistureValue();
+
+        HAL_Delay(4000); // Delay for 10 seconds
+    }
 }
 
 /**
@@ -109,6 +109,22 @@ void SystemClock_Config(void)
 }
 
 
+void TransmitMoistureValue() {
+    char str[50];
+    sprintf(str, "Sensor 1: %d and Sensor 2: %d", sensor_value1, sensor_value2);
+    TransmitString(str);
+}
+
+
+void TransmitChar(char c)
+{
+	while (!(USART3->ISR & USART_ISR_TXE))
+		; // exits once the flag is set.
+
+	// Write the character into the transmit data register.
+	USART3->TDR = c;
+}
+
 void init_UART()
 {
 	// Enable UART Clock
@@ -138,80 +154,85 @@ void Start_UART()
 
 void init_GPIO(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-	// Enable GPIO clocks
+    // Enable GPIO clocks
 	__HAL_RCC_GPIOA_CLK_ENABLE(); // For UART
-	__HAL_RCC_GPIOB_CLK_ENABLE(); // For UART
-	__HAL_RCC_GPIOC_CLK_ENABLE(); // For ADC
-	__HAL_RCC_ADC1_CLK_ENABLE();  // For ADC
+    __HAL_RCC_GPIOB_CLK_ENABLE(); // For UART
+    __HAL_RCC_GPIOC_CLK_ENABLE(); // For ADC
+	__HAL_RCC_ADC1_CLK_ENABLE(); // For ADC
 
-	// UART GPIO Configuration
-	// PB10 -> USART3_TX, PB11 -> USART3_RX
-	GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF4_USART3;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    // UART GPIO Configuration
+    // PB10 -> USART3_TX, PB11 -> USART3_RX
+    GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF4_USART3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	// ADC GPIO Configuration
-	// PC0 -> ADC1_IN10
-	GPIO_InitStruct.Pin = GPIO_PIN_0;
-	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	// No need to set Speed or Alternate as it's analog mode
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    // ADC GPIO Configuration
+    // PC0 -> ADC1_IN10
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    // No need to set Speed or Alternate as it's analog mode
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
-void init_ADC()
-{
-	// ADC Configuration
-	ADC_ChannelConfTypeDef sConfig = {0};
+void init_ADC() {
+    ADC_ChannelConfTypeDef sConfig = {0};
 
-	// Configure the ADC peripheral
-	hadc.Instance = ADC1;
-	hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-	hadc.Init.Resolution = ADC_RESOLUTION_8B;
-	hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-	// hadc.Init.ScanConvMode = ADC_SCAN_DISABLE;
+    // Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversions)
+    hadc.Instance = ADC1;
+    hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+    hadc.Init.Resolution = ADC_RESOLUTION_8B;
+    hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc.Init.ScanConvMode = ENABLE;  // Scan mode enabled for multiple channel readings
+    hadc.Init.EOCSelection = ADC_EOC_SEQ_CONV;
+    hadc.Init.LowPowerAutoWait = DISABLE;
+    hadc.Init.ContinuousConvMode = ENABLE;
+    hadc.Init.DiscontinuousConvMode = DISABLE;
+    hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+    hadc.Init.DMAContinuousRequests = DISABLE;
+    hadc.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
 
-	hadc.Init.ScanConvMode = DISABLE; // omit this line if scanning is not used
+    if (HAL_ADC_Init(&hadc) != HAL_OK) {
+        Error_Handler();
+    }
 
-	hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-	hadc.Init.LowPowerAutoWait = DISABLE;
-	hadc.Init.ContinuousConvMode = ENABLE;
-	hadc.Init.DiscontinuousConvMode = DISABLE;
-	hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-	hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-	hadc.Init.DMAContinuousRequests = DISABLE;
-	hadc.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+    // Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+    sConfig.Channel = ADC_CHANNEL_10;
+    sConfig.Rank = 1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
+    HAL_ADC_ConfigChannel(&hadc, &sConfig);
 
-	if (HAL_ADC_Init(&hadc) != HAL_OK)
-	{
-		Error_Handler();
-	}
+    sConfig.Channel = ADC_CHANNEL_11;
+    sConfig.Rank = 2;
+    HAL_ADC_ConfigChannel(&hadc, &sConfig);
 
-	// Configure the ADC channel
-	sConfig.Channel = ADC_CHANNEL_10; // Corresponds to PC0
-	// sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
-
-	if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-
-	// Start the ADC
-	Start_ADC();
-}
-
-void Start_ADC(void)
-{
 	// Start ADC conversion
 	if (HAL_ADC_Start(&hadc) != HAL_OK)
 	{
 		Error_Handler();
+	}
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+    // Assuming that the ADC is configured to automatically fill a buffer with the values from both channels
+    // in sequence due to the scan mode being enabled and continuous conversion mode.
+    sensor_value1 = HAL_ADC_GetValue(hadc);  // First call gets the value from the first configured channel
+    sensor_value2 = HAL_ADC_GetValue(hadc);  // Second call gets the value from the next channel in sequence
+
+    TransmitMoistureValue();
+}
+
+void TransmitString(char *str)
+{
+	for (int i = 0; str[i] != '\0'; i++)
+	{
+		TransmitChar(str[i]);
 	}
 }
 
