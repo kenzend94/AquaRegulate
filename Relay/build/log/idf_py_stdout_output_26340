@@ -2,7 +2,7 @@
 -- Building ESP-IDF components for target esp32s3
 -- Project sdkconfig file E:/AquaRegulate/Relay/sdkconfig
 -- Compiler supported targets: xtensa-esp-elf
--- App "Relay" version: f9c8ebc-dirty
+-- App "Relay" version: e82b477-dirty
 -- Adding linker script E:/AquaRegulate/Relay/build/esp-idf/esp_system/ld/memory.ld
 -- Adding linker script C:/Users/kenze/esp/v5.2.1/esp-idf/components/esp_system/ld/esp32s3/sections.ld.in
 -- Adding linker script C:/Users/kenze/esp/v5.2.1/esp-idf/components/esp_rom/esp32s3/ld/esp32s3.rom.ld

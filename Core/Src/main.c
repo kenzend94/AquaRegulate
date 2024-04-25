@@ -19,7 +19,8 @@
 // include hal adc
 #include "stm32f0xx_hal_adc.h"
 #include "stm32f0xx_hal_adc_ex.h"
-
+#include "stm32f0xx_hal_dma.h"
+#include "string.h"
 /* STM32F072RB
 PB10 -> TX
 PB11 -> RX */
@@ -36,15 +37,17 @@ UART_HandleTypeDef huart3;
 void init_ADC();
 void Start_ADC(void);
 ADC_HandleTypeDef hadc;
+DMA_HandleTypeDef hdma_adc; // DMA
 
 // GPIO
 void init_GPIO();
 
-uint32_t temp_sensor_value;
+// uint32_t temp_sensor_value;
+
+uint32_t adc_value; // Change this to a single value
 
 int main(void)
 {
-	/************ ADC START ************/
 	// Basic Setup
 	HAL_Init();
 	SystemClock_Config();
@@ -58,19 +61,22 @@ int main(void)
 
 	while (1)
 	{
-		// Get the ADC value
-		if (HAL_ADC_PollForConversion(&hadc, 1000) == HAL_OK)
-		{
-			// Convert temp_sensor_value from hex to dec
-			HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value: ", 11, 1000);
-			temp_sensor_value = HAL_ADC_GetValue(&hadc);
-			sprintf((char *)&temp_sensor_value, "%d", temp_sensor_value);
-			HAL_UART_Transmit(&huart3, (uint8_t *)&temp_sensor_value, 4, 1000);
+		// Start ADC conversion
+		HAL_ADC_Start_DMA(&hadc, (uint32_t *)&adc_value, 1);
 
-			HAL_UART_Transmit(&huart3, (uint8_t *)"           ", 11, 1000);
-			// Delay for 1 second
-			HAL_Delay(3000);
-		}
+		// Wait for DMA transfer to complete
+		HAL_DMA_PollForTransfer(&hdma_adc, HAL_DMA_FULL_TRANSFER, HAL_MAX_DELAY);
+
+		// Convert adc_value to string and send over UART
+		char adc_str[10];
+		sprintf(adc_str, "%u", adc_value);
+		// HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value: ", 11, HAL_MAX_DELAY);
+
+		HAL_UART_Transmit(&huart3, (uint8_t *)adc_str, strlen(adc_str), HAL_MAX_DELAY);
+		// HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+
+		// Delay for 1 second
+		HAL_Delay(1000);
 	}
 }
 
@@ -107,7 +113,6 @@ void SystemClock_Config(void)
 		Error_Handler();
 	}
 }
-
 
 void init_UART()
 {
@@ -166,44 +171,60 @@ void init_GPIO(void)
 
 void init_ADC()
 {
-	// ADC Configuration
-	ADC_ChannelConfTypeDef sConfig = {0};
+    // ADC Configuration
+    ADC_ChannelConfTypeDef sConfig = {0};
 
-	// Configure the ADC peripheral
-	hadc.Instance = ADC1;
-	hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-	hadc.Init.Resolution = ADC_RESOLUTION_8B;
-	hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-	// hadc.Init.ScanConvMode = ADC_SCAN_DISABLE;
+    // Configure the ADC peripheral
+    hadc.Instance = ADC1;
+    hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+    hadc.Init.Resolution = ADC_RESOLUTION_12B; // Change resolution to 12-bit
+    hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc.Init.ScanConvMode = DISABLE;
+    hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    hadc.Init.LowPowerAutoWait = DISABLE;
+    hadc.Init.ContinuousConvMode = DISABLE; // Change to single conversion mode
+    hadc.Init.DiscontinuousConvMode = DISABLE;
+    hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+    hadc.Init.DMAContinuousRequests = ENABLE; // Enable DMA continuous requests
+    hadc.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
 
-	hadc.Init.ScanConvMode = DISABLE; // omit this line if scanning is not used
+    if (HAL_ADC_Init(&hadc) != HAL_OK)
+    {
+        Error_Handler();
+    }
 
-	hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-	hadc.Init.LowPowerAutoWait = DISABLE;
-	hadc.Init.ContinuousConvMode = ENABLE;
-	hadc.Init.DiscontinuousConvMode = DISABLE;
-	hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-	hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-	hadc.Init.DMAContinuousRequests = DISABLE;
-	hadc.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+    // Configure the ADC channel
+    sConfig.Channel = ADC_CHANNEL_10; // Corresponds to PC0
+    sConfig.Rank = 1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
 
-	if (HAL_ADC_Init(&hadc) != HAL_OK)
-	{
-		Error_Handler();
-	}
+    if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
 
-	// Configure the ADC channel
-	sConfig.Channel = ADC_CHANNEL_10; // Corresponds to PC0
-	// sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
+    // Configure DMA for ADC
+    __HAL_RCC_DMA1_CLK_ENABLE(); // Enable DMA1 clock
 
-	if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
+    hdma_adc.Instance = DMA1_Channel1;
+    hdma_adc.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_adc.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_adc.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_adc.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_adc.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_adc.Init.Mode = DMA_CIRCULAR;
+    hdma_adc.Init.Priority = DMA_PRIORITY_LOW;
 
-	// Start the ADC
-	Start_ADC();
+    if (HAL_DMA_Init(&hdma_adc) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    __HAL_LINKDMA(&hadc, DMA_Handle, hdma_adc); // Link DMA handle to ADC handle
+
+    // Start the ADC
+    Start_ADC();
 }
 
 void Start_ADC(void)
