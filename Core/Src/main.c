@@ -197,7 +197,8 @@ void init_ADC()
     // Configure the ADC channel
     sConfig.Channel = ADC_CHANNEL_10; // Corresponds to PC0
     sConfig.Rank = 1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
+    sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES_5;
+	// chnage sampletime to 1000 cycles
 
     if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
     {
