@@ -25,6 +25,10 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_netif.h"
+#include "lwip/err.h"
+#include "lwip/sys.h"
+#include "lwip/inet.h"
+
 
 // header file with Wi-Fi credentials
 #include "wifi_cred.h"
@@ -63,6 +67,13 @@ void wifi_init_sta(void)
 
     // Set the hostname to "AquaRegulate"
     esp_netif_set_hostname(my_sta, MY_WIFI_HOSTNAME);
+
+    // Set static IP
+    esp_netif_ip_info_t ipInfo;
+    ipInfo.ip.addr = ipaddr_addr("192.168.115.191");
+    ipInfo.netmask.addr = ipaddr_addr("255.255.255.0");
+    esp_netif_dhcpc_stop(my_sta); // Stop DHCP client
+    esp_netif_set_ip_info(my_sta, &ipInfo);
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
