@@ -2,6 +2,17 @@
 ![Logo](Images/logo.jpeg)
 - AquaRegulate is an automated plant watering system that regulates soil moisture using soil moisture sensors and solenoid valves, ensuring your plants stay perfectly hydrated.
 
+## :ledger: Index
+- [What is our project about?](#wrench-what-is-our-project-about)
+  - [Pre-Requisites](#notebook-pre-requisites)
+  - [Purpose](#memo-purpose)
+  - [Functionality](#nut_and_bolt-functionality)
+  - [Features](#gear-features)
+  - [File Structure](#file_folder-file-structure)
+- [Bill of Materials](#notebook-bill-of-materials)
+- [Gallery](#camera-gallery)
+- [Credit/Acknowledgment](#star2-creditacknowledgment)
+
 ##  :wrench: What is our project about?
 
 ### :notebook: Pre-Requisites
