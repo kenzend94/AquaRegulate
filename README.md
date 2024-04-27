@@ -1,5 +1,5 @@
 # AquaRegulate: Smart Plant Hydration System
-![Logo](Images/logo.jpeg =100x20)
+![Logo](Images/logo.jpeg)
 - AquaRegulate is an automated plant watering system that regulates soil moisture using soil moisture sensors and solenoid valves, ensuring your plants stay perfectly hydrated.
 
 ## :ledger: Index
@@ -103,3 +103,4 @@ Pictures of your project.
 - Jeniffer Limondo: u1063824@umail.utah.edu
 - Khoi Nguyen: khoi.nguyen@utah.edu
 - Seoin Kim: seoin.kim@utah.edu
+- Eddie Franco: u1379136@utah.edu
