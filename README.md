@@ -113,13 +113,13 @@ Add a file structure here with the basic details about files, below is an exampl
 ###**Plants**
 ![Plants](Images/plants.jpeg)
 
-###**Circuits and Relay**
+### **Circuits and Relay**
 ![Circuits and Relay](Images/circuits-and-relay.jpeg)
 
-###**Pump**
+### **Pump**
 ![Pump](Images/pump.jpeg)
 
-###**Whole Project**
+### **Whole Project**
 ![Whole Project](Images/whole-project.jpeg)
 
 ## :notebook: Bill of Materials
