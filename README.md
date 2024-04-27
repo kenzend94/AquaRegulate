@@ -13,6 +13,7 @@
   - [Wiring Diagram](#wiring-diagram)
   - [Schematics](#schematics)
   - [Flowchart](#flowchart)
+  - [Project Pictures](#project-pictures)
 - [Bill of Materials](#notebook-bill-of-materials)
 - [Gallery](#camera-gallery)
 - [Credit/Acknowledgment](#star2-creditacknowledgment)
@@ -107,6 +108,19 @@ Add a file structure here with the basic details about files, below is an exampl
 
 ### Flowchart
 ![Flowchart](Images/flowchart.png)
+
+## Project Pictures
+###**Plants**
+![Plants](Images/plants.jpeg)
+
+### **Circuits and Relay**
+![Circuits and Relay](Images/circuits-and-relay.jpeg)
+
+### **Pump**
+![Pump](Images/pump.jpeg)
+
+### **Whole Project**
+![Whole Project](Images/whole-project.jpeg)
 
 ## :notebook: Bill of Materials
 | Description                                                          | Part Number                                                                                                                                                                                    | Datahseet                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Qty | Unit Price     | Extended Price           |
