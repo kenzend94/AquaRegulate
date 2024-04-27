@@ -89,7 +89,21 @@ Add a file structure here with the basic details about files, below is an exampl
 ![Diagram](Images/diagram.jpg)
 
 ### Custom PCB Schematic
+**The whole schematic**
 ![Schematics](Images/schematic.jpg)
+
+**Front of PCB**
+![Front](Images/final_schematic_pcb_front.jpg)
+
+**Back of PCB**
+![Back](Images/final_schematic_pcb_back.jpg)
+
+**Fill All Zones**
+![Fill All](Images/final_schematic_pcb_fill_all_zones.jpg)
+
+**Unfill All Zones**
+![Unfill All](Images/final_schematic_pcb_unfill_all_zones.jpg)
+
 
 ### Flowchart
 ![Flowchart](Images/flowchart.png)
