@@ -2,17 +2,6 @@
 ![Logo](Images/logo.jpeg)
 - AquaRegulate is an automated plant watering system that regulates soil moisture using soil moisture sensors and solenoid valves, ensuring your plants stay perfectly hydrated.
 
-## :ledger: Index
-- [What is our project about?](#what-is-our-project-about)
-  - [Pre-Requisites](#pre-requisites)
-  - [Purpose](#purpose)
-  - [Functionality](#functionality)
-  - [Features](#features)
-  - [File Structure](#file-structure)
-- [Bill of Materials](#bill-of-materials)
-- [Gallery](#gallery)
-- [Credit/Acknowledgment](#creditacknowledgment)
-
 ##  :wrench: What is our project about?
 
 ### :notebook: Pre-Requisites
@@ -44,7 +33,11 @@ The purpose of AquaRegulate is to efficiently water plants or crops without the 
 -	The ESP32 microcontroller performs the logic logarithm to determine the appropriate action, deciding whether watering is needed based on the received sensor readings.
 
 **Relay Driver**
-The schematic shows a setup where an ESP32 microcontroller is set up to operate five relay (RZ03-1C4-D012) modules allowing for the control of electrical appliances. Each relay is controlled by a TIP120 Darlington transistor acting as a switch, which is managed by the ESP32 using its GPIO pins. The relay circuits include 1N4001 diodes to prevent voltage spikes, from loads and LEDs that light up to show relays. The relay coils receive power from a shared +12V line while the ESP32 itself is powered by a +3.3V source. This configuration enables the ESP32s signals to handle power circuits effectively making it an efficient solution, for automating or remotely controlling multiple devices at once.
+- The schematic shows a setup where an ESP32 microcontroller is set up to operate five relay (RZ03-1C4-D012) modules allowing for the control of electrical appliances. 
+- Each relay is controlled by a TIP120 Darlington transistor acting as a switch, which is managed by the ESP32 using its GPIO pins.
+- The relay circuits include 1N4001 diodes to prevent voltage spikes, from loads and LEDs that light up to show relays. 
+- The relay coils receive power from a shared +12V line while the ESP32 itself is powered by a +3.3V source. 
+- This configuration enables the ESP32s signals to handle power circuits effectively making it an efficient solution, for automating or remotely controlling multiple devices at once.
 
 **Solenoid Activation**
 - When the relays are activated, they energize the solenoids, allowing water to flow through the irrigation pipes and reach the plants.
