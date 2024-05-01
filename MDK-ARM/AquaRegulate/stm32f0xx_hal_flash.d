@@ -8,9 +8,9 @@ aquaregulate/stm32f0xx_hal_flash.o: \
   ..\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f072xb.h \
   ..\Drivers\CMSIS\Include\core_cm0.h \
   C:\Keil_v5\ARM\ARMCLANG\include\stdint.h \
-  E:\AquaRegulate\Drivers\CMSIS\Include\cmsis_version.h \
-  E:\AquaRegulate\Drivers\CMSIS\Include\cmsis_compiler.h \
-  E:\AquaRegulate\Drivers\CMSIS\Include\cmsis_armclang.h \
+  C:\Users\kenze\OneDrive\Desktop\AquaRegulate\Drivers\CMSIS\Include\cmsis_version.h \
+  C:\Users\kenze\OneDrive\Desktop\AquaRegulate\Drivers\CMSIS\Include\cmsis_compiler.h \
+  C:\Users\kenze\OneDrive\Desktop\AquaRegulate\Drivers\CMSIS\Include\cmsis_armclang.h \
   C:\Keil_v5\ARM\ARMCLANG\include\arm_compat.h \
   C:\Keil_v5\ARM\ARMCLANG\include\arm_acle.h \
   ..\Drivers\CMSIS\Device\ST\STM32F0xx\Include\system_stm32f0xx.h \
