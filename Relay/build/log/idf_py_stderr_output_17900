@@ -1,0 +1,17 @@
+CMake Error at E:/AquaRegulate/Relay/build/CMakeFiles/CMakeTmp/CMakeLists.txt:18 (add_executable):
+  Cannot find source file:
+
+    E:/AquaRegulate/Relay/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+
+
+CMake Error at E:/AquaRegulate/Relay/build/CMakeFiles/CMakeTmp/CMakeLists.txt:18 (add_executable):
+  No SOURCES given to target: cmTC_1f8b4
+
+
+CMake Error at C:/Users/kenze/.espressif/tools/cmake/3.24.0/share/cmake-3.24/Modules/CheckIncludeFile.cmake:95 (try_compile):
+  Failed to generate test project build system.
+Call Stack (most recent call first):
+  C:/Users/kenze/.espressif/tools/cmake/3.24.0/share/cmake-3.24/Modules/CheckTypeSize.cmake:258 (check_include_file)
+  C:/Users/kenze/esp/v5.2.1/esp-idf/CMakeLists.txt:249 (check_type_size)
+
+

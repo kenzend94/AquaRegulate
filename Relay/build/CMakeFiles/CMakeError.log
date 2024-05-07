@@ -1,0 +1,16 @@
+Determining if the include file stdint.h exists failed with the following output:
+Change Dir: E:/AquaRegulate/Relay/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Users/kenze/.espressif/tools/ninja/1.11.1/ninja.exe cmTC_4e7a0 && ninja: error: unknown target 'cmTC_4e7a0'
+
+
+
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: E:/AquaRegulate/Relay/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Users/kenze/.espressif/tools/ninja/1.11.1/ninja.exe cmTC_1f9c6 && ninja: error: loading 'build.ninja': The system cannot find the file specified.
+
+
+
+
+

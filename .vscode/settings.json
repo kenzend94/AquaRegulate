@@ -4,7 +4,7 @@
         "interface/ftdi/esp32_devkitj_v1.cfg",
         "target/esp32s3.cfg"
     ],
-    "cmake.sourceDirectory": "E:/AquaRegulate/ESP_UART/main",
+    "cmake.sourceDirectory": "E:/AquaRegulate/Relay",
     "files.associations": {
         "stm32f072xb.h": "c",
         "stm32f0xx_it.h": "c",

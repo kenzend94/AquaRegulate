@@ -117,7 +117,7 @@ int main(void)
     HAL_UART_Transmit(&huart3, (uint8_t *)"ADC DMA started 1\r\n", 19, 1000);
   }
 
-  HAL_UART_Transmit(&huart3, (uint8_t *)"ADC DMA started 2\r\n", 20, 1000);
+  // HAL_UART_Transmit(&huart3, (uint8_t *)"ADC DMA started 2\r\n", 20, 1000);
 
   /* USER CODE END 2 */
 
