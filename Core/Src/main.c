@@ -3,239 +3,357 @@
  ******************************************************************************
  * @file           : main.c
  * @brief          : Main program body
- * Name: AquaRegulate
- * Date: 04/01/2024
- * School: The Univeristy of Utah
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
  ******************************************************************************
  */
 /* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32f072xb.h"
-#include "stm32f0xx_it.h"
-#include "stdio.h"
-#include "stm32f0xx_hal.h"
-// include hal gpio
-#include "stm32f0xx_hal_gpio.h"
-// include hal adc
-#include "stm32f0xx_hal_adc.h"
-#include "stm32f0xx_hal_adc_ex.h"
-#include "stm32f0xx_hal_dma.h"
-#include "string.h"
-/* STM32F072RB
-PB10 -> TX
-PB11 -> RX */
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc;
+DMA_HandleTypeDef hdma_adc;
+
+UART_HandleTypeDef huart3;
+
+/* USER CODE BEGIN PV */
+
+#include <string.h>
+#include <stdio.h>
+
+uint16_t adc_values[4]; // Array to store ADC values
+char adc_str[100];      // String to store ADC values
+
+void send_ADC_Using_UART(uint16_t adc_values[]);
+
+/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
+static void MX_ADC_Init(void);
+static void MX_USART3_UART_Init(void);
+/* USER CODE BEGIN PFP */
 
-// UART
-static void init_UART();
-void Start_UART();
-UART_HandleTypeDef huart3;
+/* USER CODE END PFP */
 
-// ADC
-void init_ADC();
-void Start_ADC(void);
-ADC_HandleTypeDef hadc;
-DMA_HandleTypeDef hdma_adc; // DMA
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
-// GPIO
-void init_GPIO();
+/* USER CODE END 0 */
 
-// uint32_t temp_sensor_value;
-
-uint32_t adc_value; // Change this to a single value
-
+/**
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
-	// Basic Setup
-	HAL_Init();
-	SystemClock_Config();
 
-	// Initialize the GPIO
-	init_GPIO();
+  /* USER CODE BEGIN 1 */
 
-	// Initialize the ADC
-	init_ADC();
-	init_UART();
+  /* USER CODE END 1 */
 
-	while (1)
-	{
-		// Start ADC conversion
-		HAL_ADC_Start_DMA(&hadc, (uint32_t *)&adc_value, 1);
+  /* MCU Configuration--------------------------------------------------------*/
 
-		// Wait for DMA transfer to complete
-		HAL_DMA_PollForTransfer(&hdma_adc, HAL_DMA_FULL_TRANSFER, HAL_MAX_DELAY);
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-		// Convert adc_value to string and send over UART
-		char adc_str[10];
-		sprintf(adc_str, "%u", adc_value);
-		// HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value: ", 11, HAL_MAX_DELAY);
+  /* USER CODE BEGIN Init */
 
-		HAL_UART_Transmit(&huart3, (uint8_t *)adc_str, strlen(adc_str), HAL_MAX_DELAY);
-		// HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+  /* USER CODE END Init */
 
-		// Delay for 1 second
-		HAL_Delay(1000);
-	}
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_ADC_Init();
+  MX_USART3_UART_Init();
+  /* USER CODE BEGIN 2 */
+
+  HAL_UART_Transmit(&huart3, (uint8_t *)"ADC DMA started\r\n", 18, 1000);
+  if (HAL_ADC_Start_DMA(&hadc, (uint32_t *)adc_values, 4) != HAL_OK)
+  {
+    HAL_UART_Transmit(&huart3, (uint8_t *)"ADC DMA failed\r\n", 17, 1000);
+    Error_Handler();
+  }
+  else
+  {
+    HAL_UART_Transmit(&huart3, (uint8_t *)"ADC DMA started 1\r\n", 19, 1000);
+  }
+
+  // HAL_UART_Transmit(&huart3, (uint8_t *)"ADC DMA started 2\r\n", 20, 1000);
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+    // sprintf(adc_str, "%d", adc_values[0]);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value 1: ", 13, HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)adc_str, strlen(adc_str), HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+
+    // // Convert adc_value for channel 11 to string and send over UART or display
+    // sprintf(adc_str, "%d", adc_values[1]);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value 2: ", 13, HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)adc_str, strlen(adc_str), HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+
+    // sprintf(adc_str, "%d", adc_values[2]);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value 3: ", 13, HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)adc_str, strlen(adc_str), HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+
+    // sprintf(adc_str, "%d", adc_values[3]);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"ADC Value 4: ", 13, HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)adc_str, strlen(adc_str), HAL_MAX_DELAY);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+
+    // HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+
+    // HAL_Delay(1000); // Delay for 1 second
+    send_ADC_Using_UART(adc_values);
+  }
+  /* USER CODE END 3 */
 }
 
 /**
  * @brief System Clock Configuration
  * @retval None
  */
+void send_ADC_Using_UART(uint16_t adc_values[])
+{
+  // Format the ADC values to string
+  sprintf(adc_str, "{1: %d, 2: %d, 3: %d, 4: %d}\r\n",
+          adc_values[0], adc_values[1], adc_values[2], adc_values[3]);
+
+  // Send the formatted ADC values over UART
+  HAL_UART_Transmit(&huart3, (uint8_t *)adc_str, strlen(adc_str), HAL_MAX_DELAY);
+
+  // Transmit a new line character
+  HAL_UART_Transmit(&huart3, (uint8_t *)"\r\n", 2, HAL_MAX_DELAY);
+
+  // Delay for 1 second
+  HAL_Delay(1000);
+}
 void SystemClock_Config(void)
 {
-	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-	/** Initializes the RCC Oscillators according to the specified parameters
-	 * in the RCC_OscInitTypeDef structure.
-	 */
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-	{
-		Error_Handler();
-	}
+  /** Initializes the RCC Oscillators according to the specified parameters
+   * in the RCC_OscInitTypeDef structure.
+   */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
-	/** Initializes the CPU, AHB and APB buses clocks
-	 */
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1;
-	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  /** Initializes the CPU, AHB and APB buses clocks
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
 
-	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-	{
-		Error_Handler();
-	}
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
-void init_UART()
+/**
+ * @brief ADC Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_ADC_Init(void)
 {
-	// Enable UART Clock
-	__HAL_RCC_USART3_CLK_ENABLE();
 
-	// UART Configuration
-	huart3.Instance = USART3;
-	huart3.Init.BaudRate = 115200;
-	huart3.Init.WordLength = UART_WORDLENGTH_8B;
-	huart3.Init.StopBits = UART_STOPBITS_1;
-	huart3.Init.Parity = UART_PARITY_NONE;
-	huart3.Init.Mode = UART_MODE_TX_RX;
-	huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  /* USER CODE BEGIN ADC_Init 0 */
 
-	// Start UART
-	Start_UART();
+  /* USER CODE END ADC_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC_Init 1 */
+
+  /* USER CODE END ADC_Init 1 */
+
+  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+   */
+  hadc.Instance = ADC1;
+  hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
+  hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc.Init.LowPowerAutoWait = DISABLE;
+  hadc.Init.LowPowerAutoPowerOff = DISABLE;
+  hadc.Init.ContinuousConvMode = ENABLE;
+  hadc.Init.DiscontinuousConvMode = DISABLE;
+  hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc.Init.DMAContinuousRequests = ENABLE;
+  hadc.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+  if (HAL_ADC_Init(&hadc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel to be converted.
+   */
+  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel to be converted.
+   */
+  sConfig.Channel = ADC_CHANNEL_1;
+  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel to be converted.
+   */
+  sConfig.Channel = ADC_CHANNEL_4;
+  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure for the selected ADC regular channel to be converted.
+   */
+  sConfig.Channel = ADC_CHANNEL_10;
+  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC_Init 2 */
+
+  /* USER CODE END ADC_Init 2 */
 }
 
-void Start_UART()
+/**
+ * @brief USART3 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_USART3_UART_Init(void)
 {
-	if (HAL_UART_Init(&huart3) != HAL_OK)
-	{
-		Error_Handler();
-	}
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
 }
 
-void init_GPIO(void)
+/**
+ * Enable DMA controller clock
+ */
+static void MX_DMA_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-	// Enable GPIO clocks
-	__HAL_RCC_GPIOA_CLK_ENABLE(); // For UART
-	__HAL_RCC_GPIOB_CLK_ENABLE(); // For UART
-	__HAL_RCC_GPIOC_CLK_ENABLE(); // For ADC
-	__HAL_RCC_ADC1_CLK_ENABLE();  // For ADC
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
 
-	// UART GPIO Configuration
-	// PB10 -> USART3_TX, PB11 -> USART3_RX
-	GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF4_USART3;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-	// ADC GPIO Configuration
-	// PC0 -> ADC1_IN10
-	GPIO_InitStruct.Pin = GPIO_PIN_0;
-	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	// No need to set Speed or Alternate as it's analog mode
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  // HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  // HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 }
 
-void init_ADC()
+/**
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void)
 {
-    // ADC Configuration
-    ADC_ChannelConfTypeDef sConfig = {0};
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
-    // Configure the ADC peripheral
-    hadc.Instance = ADC1;
-    hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-    hadc.Init.Resolution = ADC_RESOLUTION_12B; // Change resolution to 12-bit
-    hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-    hadc.Init.ScanConvMode = DISABLE;
-    hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-    hadc.Init.LowPowerAutoWait = DISABLE;
-    hadc.Init.ContinuousConvMode = DISABLE; // Change to single conversion mode
-    hadc.Init.DiscontinuousConvMode = DISABLE;
-    hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-    hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-    hadc.Init.DMAContinuousRequests = ENABLE; // Enable DMA continuous requests
-    hadc.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
-    if (HAL_ADC_Init(&hadc) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
-    // Configure the ADC channel
-    sConfig.Channel = ADC_CHANNEL_10; // Corresponds to PC0
-    sConfig.Rank = 1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES_5;
-	// chnage sampletime to 1000 cycles
-
-    if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
-    // Configure DMA for ADC
-    __HAL_RCC_DMA1_CLK_ENABLE(); // Enable DMA1 clock
-
-    hdma_adc.Instance = DMA1_Channel1;
-    hdma_adc.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_adc.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_adc.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_adc.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_adc.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_adc.Init.Mode = DMA_CIRCULAR;
-    hdma_adc.Init.Priority = DMA_PRIORITY_LOW;
-
-    if (HAL_DMA_Init(&hdma_adc) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
-    __HAL_LINKDMA(&hadc, DMA_Handle, hdma_adc); // Link DMA handle to ADC handle
-
-    // Start the ADC
-    Start_ADC();
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
-void Start_ADC(void)
-{
-	// Start ADC conversion
-	if (HAL_ADC_Start(&hadc) != HAL_OK)
-	{
-		Error_Handler();
-	}
-}
+/* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
 
@@ -245,13 +363,13 @@ void Start_ADC(void)
  */
 void Error_Handler(void)
 {
-	/* USER CODE BEGIN Error_Handler_Debug */
-	/* User can add his own implementation to report the HAL error return state */
-	__disable_irq();
-	while (1)
-	{
-	}
-	/* USER CODE END Error_Handler_Debug */
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef USE_FULL_ASSERT
@@ -264,9 +382,9 @@ void Error_Handler(void)
  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-	/* USER CODE BEGIN 6 */
-	/* User can add his own implementation to report the file name and line number,
-	   ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-	/* USER CODE END 6 */
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
