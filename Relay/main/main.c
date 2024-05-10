@@ -7,10 +7,12 @@
 #include "nvs_flash.h"
 // #include <stdlib.h>
 // #include <string.h>
+#include "influxDB.c"
 #include "relay_logic.c"
+#include "time.c"
 #include "uart.c"
 #include "wifi.c"
-#include "influxDB.c"
+
 
 void app_main(void) {
 
@@ -19,6 +21,10 @@ void app_main(void) {
 
   ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
   wifi_init_sta();
+
+  // Initialize SNTP for time synchronization
+  initialize_sntp();
+  wait_for_time_sync(); // Wait until time is synchronized
 
   // RELAY INITIALIZATION
   init_relay();
@@ -44,7 +50,21 @@ void app_main(void) {
       ESP_LOGI("UART", "Received %d bytes: %s", length, value);
 
       // Decode the values {1: 1149, 2: 3077, 3: 3016, 4: 3851} into an array
-      handle_uart_data(value);
+      const char *formattedData = handle_uart_data(value);
+
+      // const char *data = "sensors, sensor_id=1 value=8000\nsensors,
+      // sensor_id=2 value=9000\nsensors, sensor_id=3 value=1000\nsensors,
+      // sensor_id=4 value=1050\n";
+
+      if (formattedData != NULL) {
+        send_to_influxdb(formattedData);
+
+        printf("%s", formattedData);
+        free((void *)formattedData);
+      }
+
+      // wait for 5 seconds
+      vTaskDelay(5000 / portTICK_PERIOD_MS);
 
       // // if length greater than 3, then do the logic
       // int sensor_value = atoi(value);

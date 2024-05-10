@@ -1,5 +1,7 @@
 #include "driver/uart.h"
 #include "freertos/queue.h"
+#include <string.h>
+
 
 #define UART_NUM UART_NUM_0
 #define BUF_SIZE 1024
@@ -63,13 +65,28 @@ int parse_sensor_data(const char *data, SensorData *sensors, int max_sensors) {
   return count; // Return the number of sensors parsed
 }
 
-void handle_uart_data(const char *uart_data) {
+const char *handle_uart_data(const char *uart_data) {
   SensorData sensors[MAX_SENSORS];
   int num_sensors = parse_sensor_data(uart_data, sensors, MAX_SENSORS);
 
-  // Print parsed data
-  for (int i = 0; i < num_sensors; i++) {
-    printf("Sensor ID: %d, Sensor Value: %d\n", sensors[i].sensor_id,
-           sensors[i].sensor_value);
+  // Estimate the required buffer size
+  // Assuming each sensor takes up to 50 characters, including the newline and
+  // null terminator
+  int bufferSize = num_sensors * 50;
+  char *data = malloc(bufferSize);
+  if (data == NULL) {
+    return NULL; // Failed to allocate memory
   }
+
+  data[0] = '\0';      // Initialize the string with a null terminator
+  char tempBuffer[50]; // Temporary buffer for each sensor's data
+
+  // Format and append each sensor's data to the string
+  for (int i = 0; i < num_sensors; i++) {
+    sprintf(tempBuffer, "sensors,sensor_id=%d value=%d\n",
+            sensors[i].sensor_id, sensors[i].sensor_value);
+    strcat(data, tempBuffer);
+  }
+
+  return data;
 }

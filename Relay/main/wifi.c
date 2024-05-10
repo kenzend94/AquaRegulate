@@ -3,10 +3,9 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
+#include "nvs_flash.h"
 #include "wifi_cred.h"
 #include <stdint.h>
-#include "nvs_flash.h"
-
 
 // event group to handle Wi-Fi events
 static EventGroupHandle_t wifi_event_group;
@@ -14,8 +13,6 @@ const int WIFI_CONNECTED_BIT = BIT0;
 
 static const char *TAG = "wifi_station";
 static const char *TAG_NVS = "NVS_INIT";
-
-
 
 static void event_handler(void *arg, esp_event_base_t event_base,
                           int32_t event_id, void *event_data) {
@@ -73,16 +70,26 @@ void wifi_init_sta(void) {
       "wifi_init_sta finished."); // Log that Wi-Fi initialization is finished
   ESP_LOGI(TAG, "connect to ap SSID:%s password:%s", MY_WIFI_SSID,
            MY_WIFI_PASSWORD);
+
+  // Wait for Wi-Fi connection
+  EventBits_t bits = xEventGroupWaitBits(wifi_event_group, WIFI_CONNECTED_BIT,
+                                         pdFALSE, pdTRUE, portMAX_DELAY);
+  if (bits & WIFI_CONNECTED_BIT) {
+    ESP_LOGI(TAG, "connected to ap SSID:%s password:%s", MY_WIFI_SSID,
+             MY_WIFI_PASSWORD);
+  } else {
+    ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", MY_WIFI_SSID,
+             MY_WIFI_PASSWORD);
+  }
 }
 
-
-
 void init_NVS(void) {
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_LOGI(TAG_NVS, "Erasing NVS flash due to initialization error.");
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
+  esp_err_t ret = nvs_flash_init();
+  if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
+      ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    ESP_LOGI(TAG_NVS, "Erasing NVS flash due to initialization error.");
+    ESP_ERROR_CHECK(nvs_flash_erase());
+    ret = nvs_flash_init();
+  }
+  ESP_ERROR_CHECK(ret);
 }
