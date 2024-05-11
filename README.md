@@ -110,7 +110,7 @@ Add a file structure here with the basic details about files, below is an exampl
 ![Flowchart](Images/flowchart.png)
 
 ## Project Pictures
-###**Plants**
+### **Plants**
 ![Plants](Images/plants.jpeg)
 
 ### **Circuits and Relay**
