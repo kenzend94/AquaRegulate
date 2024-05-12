@@ -2,7 +2,6 @@
 #include "freertos/queue.h"
 #include <string.h>
 
-
 #define UART_NUM UART_NUM_0
 #define BUF_SIZE 1024
 #define RX_PIN 44
@@ -13,6 +12,7 @@
 typedef struct {
   int sensor_id;
   int sensor_value;
+  // int sensor_relay;
 } SensorData;
 
 void init_uart() {
@@ -83,8 +83,9 @@ const char *handle_uart_data(const char *uart_data) {
 
   // Format and append each sensor's data to the string
   for (int i = 0; i < num_sensors; i++) {
-    sprintf(tempBuffer, "sensors,sensor_id=%d value=%d\n",
-            sensors[i].sensor_id, sensors[i].sensor_value);
+    // sprintf(tempBuffer, "sensors,sensor_id=%d value=%d\n relay=%d\n",
+    sprintf(tempBuffer, "sensors,sensor_id=%d value=%d\n", sensors[i].sensor_id,
+            sensors[i].sensor_value);
     strcat(data, tempBuffer);
   }
 

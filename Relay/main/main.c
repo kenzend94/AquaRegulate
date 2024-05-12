@@ -13,7 +13,6 @@
 #include "uart.c"
 #include "wifi.c"
 
-
 void app_main(void) {
 
   // WIFI INITIALIZATION
@@ -52,10 +51,6 @@ void app_main(void) {
       // Decode the values {1: 1149, 2: 3077, 3: 3016, 4: 3851} into an array
       const char *formattedData = handle_uart_data(value);
 
-      // const char *data = "sensors, sensor_id=1 value=8000\nsensors,
-      // sensor_id=2 value=9000\nsensors, sensor_id=3 value=1000\nsensors,
-      // sensor_id=4 value=1050\n";
-
       if (formattedData != NULL) {
         send_to_influxdb(formattedData);
 
@@ -63,12 +58,8 @@ void app_main(void) {
         free((void *)formattedData);
       }
 
-      // wait for 5 seconds
-      vTaskDelay(5000 / portTICK_PERIOD_MS);
-
-      // // if length greater than 3, then do the logic
-      // int sensor_value = atoi(value);
-      // control_relay(sensor_value);
+      // wait for 1 minute
+      vTaskDelay(60000 / portTICK_PERIOD_MS);
     }
   }
 }

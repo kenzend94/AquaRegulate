@@ -1,0 +1,23 @@
+CMake Error:
+  Running
+
+   'C:/Users/kenze/.espressif/tools/ninja/1.11.1/ninja.exe' '-C' 'E:/AquaRegulate/Relay/build' '-t' 'recompact'
+
+  failed with:
+
+   ninja: error: failed recompaction: Permission denied
+
+
+
+CMake Error:
+  Running
+
+   'C:/Users/kenze/.espressif/tools/ninja/1.11.1/ninja.exe' '-C' 'E:/AquaRegulate/Relay/build' '-t' 'restat' 'build.ninja'
+
+  failed with:
+
+   ninja: error: failed recompaction: Permission denied
+
+
+
+CMake Generate step failed.  Build files cannot be regenerated correctly.

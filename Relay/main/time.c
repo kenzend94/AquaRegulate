@@ -5,12 +5,14 @@
 
 static const char *TIME_TAG = "TIME";
 
+// Initialize SNTP for time synchronization
 void initialize_sntp(void) {
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, "pool.ntp.org"); // Use the NTP server of your choice
+    esp_sntp_setservername(0, "pool.ntp.org");
     esp_sntp_init();
 }
 
+// Wait until time is synchronized
 void wait_for_time_sync(void) {
     time_t now = 0;
     struct tm timeinfo = { 0 };

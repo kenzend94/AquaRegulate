@@ -1,26 +1,21 @@
+#include "esp_err.h"
 #include "esp_http_client.h"
 #include "esp_log.h"
-#include "fullchain.h"
+#include "esp_tls.h"
 
-// #define INFLUXDB_HOST "db.kenzend.net"
-#define INFLUXDB_HOST "192.168.0.127"
-#define INFLUXDB_PORT "8086"
+#define INFLUXDB_HOST "https://db.kenzend.net"
 #define INFLUXDB_ORG "c4f03d288ae6856c"
 #define INFLUXDB_BUCKET "bucket"
 #define INFLUXDB_TOKEN                                                         \
-  "NkDekShZFA7eO8p0llgEnUNMhGSwt-Tgu8cesUdUlJZhuJxKgeDY7vqejeTBXeKkthndUSan_"  \
-  "RdDGisvIlBz_Q=="
-
-/* #define INFLUXDB_URL                                                           \
-  "https://" INFLUXDB_HOST "/api/v2/write?org=" INFLUXDB_ORG                   \
-  "&bucket=" INFLUXDB_BUCKET */
+  "FWTRnKH8iSHlzaeWiIpv7fOK_BtqZ_T2610J0TheqbNKq769c2e50va-"                   \
+  "Pgu56I02s4NEPArI64EQdADNJZnJCQ=="
 
 #define INFLUXDB_URL                                                           \
-  "http://" INFLUXDB_HOST ":" INFLUXDB_PORT "/api/v2/write?org=" INFLUXDB_ORG  \
-  "&bucket=" INFLUXDB_BUCKET
+  INFLUXDB_HOST "/api/v2/write?org=" INFLUXDB_ORG "&bucket=" INFLUXDB_BUCKET
 
 static const char *TAG_INFLUX = "INFLUXDB_CLIENT";
 
+// HTTP event handler
 esp_err_t http_event_handler(esp_http_client_event_t *evt) {
   switch (evt->event_id) {
   case HTTP_EVENT_ERROR:
@@ -38,10 +33,10 @@ esp_err_t http_event_handler(esp_http_client_event_t *evt) {
   return ESP_OK;
 }
 
+// Send data to InfluxDB
 void send_to_influxdb(const char *line_protocol_data) {
   esp_http_client_config_t config = {
       .url = INFLUXDB_URL,
-    //   .cert_pem = (const char *)fullchain_pem,
       .event_handler = http_event_handler,
 
   };
