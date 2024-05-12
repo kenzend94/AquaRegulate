@@ -3,7 +3,7 @@
 - AquaRegulate is an automated plant watering system that regulates soil moisture using soil moisture sensors and solenoid valves, ensuring your plants stay perfectly hydrated.
 
 ## :ledger: Index
-- [What is AquaRegulate about?](#wrench-what-is-our-project-about)
+- [What is AquaRegulate about?](#wrench-what-is-aquaregulate-about)
   - [Pre-Requisites](#notebook-pre-requisites)
   - [Purpose](#memo-purpose)
   - [Functionality](#nut_and_bolt-functionality)
@@ -15,10 +15,9 @@
   - [Flowchart](#flowchart)
   - [Project Pictures](#project-pictures)
 - [Bill of Materials](#notebook-bill-of-materials)
-- [Gallery](#camera-gallery)
 - [Credit/Acknowledgment](#star2-creditacknowledgment)
 
-##  :wrench: What is our project about?
+##  :wrench: What is AquaRegulate about?
 
 ### :notebook: Pre-Requisites
 - Knowledge of embedded systems and microcontroller programming.
@@ -110,7 +109,7 @@ Add a file structure here with the basic details about files, below is an exampl
 ![Flowchart](Images/flowchart.png)
 
 ## Project Pictures
-###**Plants**
+### **Plants**
 ![Plants](Images/plants.jpeg)
 
 ### **Circuits and Relay**
@@ -142,10 +141,6 @@ Add a file structure here with the basic details about files, below is an exampl
 | Proline Series 1/2-in x 1/2-in Threaded Female Adapter Union Fitting | Bulkhead Fitting                                                                                                                                                                               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 1   | $ 16.48  | $ 16.48  |
 | 1/2-in FIP Brass Quarter Turn Hose Bibb                              | Hose Bibbs                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 1   | $   11.48  | $ 11.48  |
 | Braided Stainless Steel Flexible Faucet Supply Line                  | B4F20UL-2                                                                                                                                                                                      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 2   | $6.98 | $ 13.96  |
-
-##  :camera: Gallery
-Pictures of your project.
-
 
 ## :star2: Credit/Acknowledgment
 - Jeniffer Limondo: u1063824@umail.utah.edu
