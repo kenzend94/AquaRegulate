@@ -3,19 +3,25 @@
 - AquaRegulate is an automated plant watering system that regulates soil moisture using soil moisture sensors and solenoid valves, ensuring your plants stay perfectly hydrated.
 
 ## :ledger: Index
-- [What is AquaRegulate about?](#wrench-what-is-aquaregulate-about)
-  - [Pre-Requisites](#notebook-pre-requisites)
-  - [Purpose](#memo-purpose)
-  - [Functionality](#nut_and_bolt-functionality)
-  - [Features](#gear-features)
-  - [File Structure](#file_folder-file-structure)
-- [Details about AquaRegulate](#pen-details-about-aquaregulate)
-  - [Wiring Diagram](#wiring-diagram)
-  - [Schematics](#schematics)
-  - [Flowchart](#flowchart)
+- [AquaRegulate: Smart Plant Hydration System](#aquaregulate-smart-plant-hydration-system)
+  - [:ledger: Index](#ledger-index)
+  - [:wrench: What is AquaRegulate about?](#wrench-what-is-aquaregulate-about)
+    - [:notebook: Pre-Requisites](#notebook-pre-requisites)
+    - [:memo: Purpose](#memo-purpose)
+    - [:nut\_and\_bolt: Functionality](#nut_and_bolt-functionality)
+    - [:gear: Features](#gear-features)
+    - [:file\_folder: File Structure](#file_folder-file-structure)
+  - [:pen: Details about AquaRegulate](#pen-details-about-aquaregulate)
+    - [Wiring Diagram](#wiring-diagram)
+    - [Custom PCB Schematic](#custom-pcb-schematic)
+    - [Flowchart](#flowchart)
   - [Project Pictures](#project-pictures)
-- [Bill of Materials](#notebook-bill-of-materials)
-- [Credit/Acknowledgment](#star2-creditacknowledgment)
+    - [**Plants**](#plants)
+    - [**Circuits and Relay**](#circuits-and-relay)
+    - [**Pump**](#pump)
+    - [**Whole Project**](#whole-project)
+  - [:notebook: Bill of Materials](#notebook-bill-of-materials)
+  - [:star2: Credit/Acknowledgment](#star2-creditacknowledgment)
 
 ##  :wrench: What is AquaRegulate about?
 
@@ -79,7 +85,15 @@ Add a file structure here with the basic details about files, below is an exampl
 └── Relay
     └── main
         ├── main.c
-        └── relay.c
+        ├── CMakeLists.txt
+        ├── influxDB.c
+        ├── relay_logic.c
+        ├── relay_logic.h
+        ├── sensorsData.h
+        ├── time.c
+        ├── uart.c
+        ├── wifi_cred.h
+        └── wifi.c
 ```
 
 ## :pen: Details about AquaRegulate 
