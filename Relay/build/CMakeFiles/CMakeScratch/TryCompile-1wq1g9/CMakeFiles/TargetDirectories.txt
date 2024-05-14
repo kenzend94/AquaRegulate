@@ -1,0 +1,2 @@
+E:/AquaRegulate/Relay/build/CMakeFiles/CMakeScratch/TryCompile-1wq1g9/CMakeFiles/cmTC_20f63.dir
+E:/AquaRegulate/Relay/build/CMakeFiles/CMakeScratch/TryCompile-1wq1g9/CMakeFiles/ALL_BUILD.dir

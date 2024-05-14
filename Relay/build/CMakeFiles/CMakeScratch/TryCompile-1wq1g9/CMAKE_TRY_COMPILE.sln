@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CMakePredefinedTargets", "CMakePredefinedTargets", "{CC988769-A995-3CDE-940F-DDCB6BB0F383}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ALL_BUILD", "ALL_BUILD.vcxproj", "{1A1B79DD-F9A9-35C8-AAD4-FCAE1FA4C057}"
+	ProjectSection(ProjectDependencies) = postProject
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5} = {890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cmTC_20f63", "cmTC_20f63.vcxproj", "{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|arm64 = Debug|arm64
+		Release|arm64 = Release|arm64
+		MinSizeRel|arm64 = MinSizeRel|arm64
+		RelWithDebInfo|arm64 = RelWithDebInfo|arm64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A1B79DD-F9A9-35C8-AAD4-FCAE1FA4C057}.Debug|arm64.ActiveCfg = Debug|arm64
+		{1A1B79DD-F9A9-35C8-AAD4-FCAE1FA4C057}.Release|arm64.ActiveCfg = Release|arm64
+		{1A1B79DD-F9A9-35C8-AAD4-FCAE1FA4C057}.MinSizeRel|arm64.ActiveCfg = MinSizeRel|arm64
+		{1A1B79DD-F9A9-35C8-AAD4-FCAE1FA4C057}.RelWithDebInfo|arm64.ActiveCfg = RelWithDebInfo|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.Debug|arm64.ActiveCfg = Debug|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.Debug|arm64.Build.0 = Debug|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.Release|arm64.ActiveCfg = Release|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.Release|arm64.Build.0 = Release|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.MinSizeRel|arm64.ActiveCfg = MinSizeRel|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.MinSizeRel|arm64.Build.0 = MinSizeRel|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.RelWithDebInfo|arm64.ActiveCfg = RelWithDebInfo|arm64
+		{890C6FC1-45F5-3F84-9F17-D3C05F2E77A5}.RelWithDebInfo|arm64.Build.0 = RelWithDebInfo|arm64
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1A1B79DD-F9A9-35C8-AAD4-FCAE1FA4C057} = {CC988769-A995-3CDE-940F-DDCB6BB0F383}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {78B8E234-CD6F-31F8-AC8B-7ECE5602CC45}
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

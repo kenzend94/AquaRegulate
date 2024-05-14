@@ -48,7 +48,11 @@ void app_main(void) {
       char *value = (char *)data;
       ESP_LOGI("UART", "Received %d bytes: %s", length, value);
 
-      // Decode the values {1: 1149, 2: 3077, 3: 3016, 4: 3851} into an array
+      // Decode the values {1: 1149, 2: 3077, 3: 3016, 4: 3851} into protocol
+      // line format Ex: sensor,sensor_id=1 value=1149,relay_status=1
+      // sensor,sensor_id=2 value=3077,relay_status=0
+      // sensor,sensor_id=3 value=3016,relay_status=1
+      // sensor,sensor_id=4 value=3851,relay_status=0
       const char *formattedData = handle_uart_data(value);
 
       if (formattedData != NULL) {
@@ -57,9 +61,8 @@ void app_main(void) {
         printf("%s", formattedData);
         free((void *)formattedData);
       }
-
-      // wait for 1 minute
-      vTaskDelay(60000 / portTICK_PERIOD_MS);
     }
+    // wait for 10 seconds
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
   }
 }

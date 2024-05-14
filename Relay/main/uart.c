@@ -1,19 +1,13 @@
 #include "driver/uart.h"
 #include "freertos/queue.h"
+#include "relay_logic.h"
+#include "sensorsData.h"
 #include <string.h>
 
 #define UART_NUM UART_NUM_0
 #define BUF_SIZE 1024
 #define RX_PIN 44
 #define TX_PIN 43
-
-#define MAX_SENSORS 4
-
-typedef struct {
-  int sensor_id;
-  int sensor_value;
-  // int sensor_relay;
-} SensorData;
 
 void init_uart() {
   uart_config_t uart_config = {
@@ -37,55 +31,66 @@ void init_uart() {
                                       uart_buffer_size, 10, &uart_queue, 0));
 }
 
+// Parse the sensor data and determine the relay status
 int parse_sensor_data(const char *data, SensorData *sensors, int max_sensors) {
   const char *start = data;
   int count = 0;
 
-  // Skip non-numeric characters to find the first sensor ID
+  // Parse the sensor data
   while (*start && (count < max_sensors)) {
     if (*start == '{' || *start == ',' || *start == ' ') {
       start++;
       continue;
     }
 
-    // Read sensor ID and value
     int sensor_id, sensor_value;
+
+    // Parse the sensor ID and value
     if (sscanf(start, "%d: %d", &sensor_id, &sensor_value) == 2) {
       sensors[count].sensor_id = sensor_id;
       sensors[count].sensor_value = sensor_value;
+      // Determine relay status based on sensor ID and value
+      // if (sensor_id == 1) {
+      //   sensors[count].sensor_relay = (sensor_value < 800) ? 0
+      //                                 : (sensor_value > 1000)
+      //                                     ? 1
+      //                                     : sensors[count].sensor_relay;
+      // } else if (sensor_id == 2 || sensor_id == 3 || sensor_id == 4) {
+      //   sensors[count].sensor_relay = (sensor_value < 2400) ? 0
+      //                                 : (sensor_value > 2900)
+      //                                     ? 1
+      //                                     : sensors[count].sensor_relay;
+      // }
+
+      // call the control_relay function to control the relay
+      control_relay(&sensors[count]);
       count++;
     }
 
-    // Move to the next part of the string
     while (*start && *start != ',') {
       start++;
     }
   }
 
-  return count; // Return the number of sensors parsed
+  return count;
 }
-
 const char *handle_uart_data(const char *uart_data) {
   SensorData sensors[MAX_SENSORS];
   int num_sensors = parse_sensor_data(uart_data, sensors, MAX_SENSORS);
 
-  // Estimate the required buffer size
-  // Assuming each sensor takes up to 50 characters, including the newline and
-  // null terminator
-  int bufferSize = num_sensors * 50;
+  int bufferSize = num_sensors * 60; // Adjusted buffer size for relay status
   char *data = malloc(bufferSize);
   if (data == NULL) {
-    return NULL; // Failed to allocate memory
+    return NULL;
   }
 
-  data[0] = '\0';      // Initialize the string with a null terminator
-  char tempBuffer[50]; // Temporary buffer for each sensor's data
+  data[0] = '\0';
+  char tempBuffer[60]; // Adjusted buffer size for relay status
 
-  // Format and append each sensor's data to the string
   for (int i = 0; i < num_sensors; i++) {
-    // sprintf(tempBuffer, "sensors,sensor_id=%d value=%d\n relay=%d\n",
-    sprintf(tempBuffer, "sensors,sensor_id=%d value=%d\n", sensors[i].sensor_id,
-            sensors[i].sensor_value);
+    sprintf(tempBuffer, "sensors_data,sensor_id=%d value=%d,relay_status=%d\n",
+            sensors[i].sensor_id, sensors[i].sensor_value,
+            sensors[i].sensor_relay);
     strcat(data, tempBuffer);
   }
 
