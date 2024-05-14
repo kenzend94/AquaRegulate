@@ -1,6 +1,12 @@
 # AquaRegulate: Smart Plant Hydration System
-![Logo](Images/logo.jpeg)
+<div align="center">
+    <img src="Images/logo.jpeg" alt="Logo">
+</div>
 - AquaRegulate is an automated plant watering system that regulates soil moisture using soil moisture sensors and solenoid valves, ensuring your plants stay perfectly hydrated.
+
+<div align="center" style="font-size: larger;">
+    <a href="https://aquaregulate.kenzend.net/">Live demo</a>
+</div>
 
 ## :ledger: Index
 - [AquaRegulate: Smart Plant Hydration System](#aquaregulate-smart-plant-hydration-system)
