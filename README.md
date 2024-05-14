@@ -160,4 +160,3 @@ Add a file structure here with the basic details about files, below is an exampl
 - Jeniffer Limondo: u1063824@umail.utah.edu
 - Khoi Nguyen: khoi.nguyen@utah.edu
 - Seoin Kim: seoin.kim@utah.edu
-- Eddie Franco: u1379136@utah.edu
