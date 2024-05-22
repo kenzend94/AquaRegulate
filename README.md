@@ -42,7 +42,7 @@ The purpose of AquaRegulate is to efficiently water plants or crops without the 
 
 ### :nut_and_bolt: Functionality
 - Soil moisture sensors to measure the moisture level in the soil.
-- Controlling solenoid valves to regulate the water flow to the plants based on the .
+- Controlling solenoid valves to regulate the water flow to the plants based on the moisture sensor values.
 - When the soil moisture is above a certain threshold, the system opens the solenoid valves to water the plants.
 - Once the moisture level reaches the desired level, the system closes the solenoid valves to stop watering.
 - The system continuously monitors the soil moisture level and adjusts the watering accordingly to maintain optimal hydration for the plants.
